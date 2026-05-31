@@ -72,8 +72,9 @@ Export a pseudo-Boolean OPB instance:
 python3 -m src.erdos835_one_color opb --no-row-comments --output artifacts/problem835_one_color.opb
 ```
 
-For the 32GB i5-13400 Windows PC, see `docs/pc_execution.md`.  The recommended
-path is WSL2 Ubuntu, one-colour OPB first, and strict solver time/memory limits.
+For the 32GB i5-13400 Windows PC, see `docs/pc_execution.md` and
+`docs/solver_runbook.md`.  The recommended path is WSL2 Ubuntu, one-colour OPB
+first, and strict solver time/memory limits.
 
 ## Files
 
@@ -83,7 +84,12 @@ path is WSL2 Ubuntu, one-colour OPB first, and strict solver time/memory limits.
 - `tests/test_one_color.py`: unit tests, including a small resolvable toy
   instance.
 - `notes/erdos835_first_layer_note.tex`: compact mathematical note.
+- `docs/current_information.md`: consolidated current mathematical and
+  computational status.
 - `docs/pc_execution.md`: practical execution guidance for the 32GB Windows PC.
+- `docs/solver_runbook.md`: staged runbook for solver attempts and result
+  interpretation.
+- `docs/progress_log.md`: dated log of repo setup and verification.
 - `prompts/pro_next_round.md`: prompt for a stronger model to continue the
   attack without web search.
 
