@@ -76,6 +76,8 @@ For the 32GB i5-13400 Windows PC, see `docs/pc_execution.md` and
 `docs/solver_runbook.md`.  The recommended path is WSL2 Ubuntu, one-colour OPB
 first, and strict solver time/memory limits.
 
+If this repo is opened by Codex on the Windows PC, start from `TASKS.md`.
+
 ## Files
 
 - `src/erdos835_one_color.py`: parameter model, statistics, and sparse row
@@ -83,6 +85,7 @@ first, and strict solver time/memory limits.
 - `src/verify_one_color.py`: verifier for candidate one-color solutions.
 - `tests/test_one_color.py`: unit tests, including a small resolvable toy
   instance.
+- `TASKS.md`: handoff task brief for Codex on the Windows PC.
 - `notes/erdos835_first_layer_note.tex`: compact mathematical note.
 - `docs/current_information.md`: consolidated current mathematical and
   computational status.

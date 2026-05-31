@@ -57,3 +57,8 @@ Current mathematical status:
 - If raw solving stalls, move to fixed-\(D_a\), symmetry breaking, or smaller
   derived subsystems.
 
+Added Windows-Codex handoff:
+
+- `TASKS.md` now gives the exact task sequence for Codex on the Windows PC:
+  clone, smoke test, OPB export, optional bounded solver attempt, logging,
+  result classification, and next-step decision rules.
