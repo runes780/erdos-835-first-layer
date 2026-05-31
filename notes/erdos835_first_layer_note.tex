@@ -1,0 +1,101 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+
+\newcommand{\binomV}[2]{\binom{#1}{#2}}
+
+\title{A one-colour exact-cover test for the first remaining case of Problem 835}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section*{The first layer}
+
+In the usual reduction of Problem 835, a colouring for the case \(k\) gives a
+large set \(S(k-1,k,2k)\).  The known necessary conditions leave the first
+serious case \(k=16\).  The first-layer derivation used here may be stated as
+follows.
+
+Let \(V\) be a set of 21 points.  Suppose that
+\[
+  D:\binomV{V}{5}\longrightarrow \mathbb F_{17}
+\]
+is an \(LS(4,5,21)\), and suppose that there are eleven functions
+\[
+  g_j:\binomV{V}{6}\longrightarrow \mathbb F_{17},
+  \qquad j=1,\ldots,11,
+\]
+such that each \(g_j\) point-extends \(D\), and for every 6-set \(U\subset V\)
+one has
+\[
+  \{g_1(U),\ldots,g_{11}(U)\}
+  =
+  \mathbb F_{17}\setminus
+  \{D(U\setminus\{u\}):u\in U\}.
+\]
+An obstruction to this first layer would rule out the \(k=16\) case.
+
+\section*{One fixed colour}
+
+Fix \(a\in\mathbb F_{17}\).  Put
+\[
+  D_a=\{S\in\binomV{V}{5}:D(S)=a\},
+  \qquad
+  G_{j,a}=\{U\in\binomV{V}{6}:g_j(U)=a\}.
+\]
+Then \(D_a\) is an \(S(4,5,21)\), and the sets \(D_a,G_{1,a},\ldots,G_{11,a}\)
+must satisfy the following exact-cover equations:
+\[
+  \sum_{\substack{S\supset T\\ |S|=5}} d_S=1
+  \quad\text{for all }T\in\binomV{V}{4},
+\]
+\[
+  d_S+\sum_{v\in V\setminus S}x_{j,S\cup\{v\}}=1
+  \quad\text{for all }j=1,\ldots,11,\ S\in\binomV{V}{5},
+\]
+and
+\[
+  \sum_{j=1}^{11}x_{j,U}
+  +\sum_{\substack{S\subset U\\ |S|=5}}d_S=1
+  \quad\text{for all }U\in\binomV{V}{6}.
+\]
+Here \(d_S\) is the indicator of \(S\in D_a\), and \(x_{j,U}\) is the indicator
+of \(U\in G_{j,a}\).
+
+\section*{Size of the test}
+
+There are
+\[
+  \binom{21}{5}=20349
+\]
+\(d\)-variables and
+\[
+  11\binom{21}{6}=596904
+\]
+\(x\)-variables.  Thus the exact-cover matrix has \(617253\) rows.  The
+columns are the \(4\)-set equations, the \((j,S)\)-equations, and the
+\(6\)-set equations, namely
+\[
+  \binom{21}{4}+11\binom{21}{5}+\binom{21}{6}
+  =5985+223839+54264
+  =284088.
+\]
+Each column has length \(17\).  Counting row incidences gives
+\[
+  \binom{21}{5}(5+11+16)+11\binom{21}{6}(6+1)
+  =4829496.
+\]
+
+\section*{Computational target}
+
+The useful target is not to enumerate all \(LS(4,5,21)\)'s.  It is first to
+decide whether the one-colour exact-cover instance above is satisfiable.  An
+UNSAT certificate for this instance would already contradict the assumed
+first-layer object.  If it is satisfiable, the next useful target is to extract
+structural information from its solutions, especially automorphisms, forced
+block counts on small subsets, and any obstruction to assembling all seventeen
+colours simultaneously.
+
+\end{document}

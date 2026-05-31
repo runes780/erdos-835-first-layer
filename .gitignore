@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+.DS_Store
+.pytest_cache/
+*.aux
+*.log
+*.out
+*.synctex.gz
+notes/*.pdf
+artifacts/
