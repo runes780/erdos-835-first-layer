@@ -107,6 +107,47 @@ class ExtensionLadderOpbTests(unittest.TestCase):
         self.assertEqual(d3_line.count("+1 x"), 28)
         self.assertIn(" = 4 ;", d3_line)
 
+    def test_opb_can_add_g4_count_constraints(self):
+        config = OneColorConfig(v=7, t=4, extension_count=1)
+
+        text = export_extension_ladder_opb(config, add_g4_counts=True)
+
+        lines = text.splitlines()
+        self.assertEqual(lines[0], "* #variable= 28 #constraint= 91")
+        g4_line = next(line for line in lines if line.endswith("; * G4:0:0,1,2,3"))
+        self.assertEqual(g4_line.count("+1 x"), 3)
+        self.assertIn(" = 1 ;", g4_line)
+
+    def test_opb_can_force_residual_orbit_branch_block(self):
+        config = OneColorConfig(v=7, t=4, extension_count=1)
+
+        text = export_extension_ladder_opb(config, forced_d_blocks=[(0, 1, 2, 3, 4)])
+
+        lines = text.splitlines()
+        self.assertEqual(lines[0], "* #variable= 28 #constraint= 57")
+        self.assertIn("+1 x1 = 1 ; * force:D:0,1,2,3,4", lines)
+
+    def test_g4_count_constraints_are_only_for_strength_four(self):
+        config = OneColorConfig(v=6, t=1, extension_count=1)
+
+        with self.assertRaisesRegex(ValueError, "G4 count constraints require t=4"):
+            export_extension_ladder_opb(config, add_g4_counts=True)
+
+    def test_problem_e1_g4_branch_opb_count_matches_next_experiment(self):
+        config = OneColorConfig(v=21, t=4, extension_count=1)
+
+        text = export_extension_ladder_opb(
+            config,
+            include_row_comments=False,
+            include_column_comments=False,
+            symmetry_break="triple-matching-off-triple",
+            add_d_lower_counts=True,
+            add_g4_counts=True,
+            forced_d_blocks=[(0, 1, 3, 6, 8)],
+        )
+
+        self.assertEqual(text.splitlines()[0], "* #variable= 74613 #constraint= 33892")
+
 
 class ExtensionLadderCliTests(unittest.TestCase):
     def test_stats_cli_outputs_json(self):

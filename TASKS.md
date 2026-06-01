@@ -217,6 +217,24 @@ TIME_LIMIT_SECONDS=7200 bash scripts/run_cadical_e1_2h.sh
 The local CaDiCaL binary may be unpacked under
 `artifacts/solvers/cadical_pkg/usr/bin/cadical`.
 
+The E1 CNF is a baseline pairwise exact-one encoding plus symmetry unit
+clauses.  It does not include D lower-count equalities.  After the baseline
+Kissat timeout, generate the two residual-orbit branch CNFs:
+
+```bash
+bash scripts/export_problem835_e1_branch_cnfs.sh
+BRANCH=a TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e1_branch_2h.sh
+BRANCH=b TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e1_branch_2h.sh
+```
+
+For the strengthened OPB branch version with D lower counts and G4 equalities:
+
+```bash
+bash scripts/export_problem835_e1_g4_branch_opbs.sh
+BRANCH=a TIME_LIMIT_SECONDS=3600 bash scripts/run_roundingsat_e1_g4_branch_1h.sh
+BRANCH=b TIME_LIMIT_SECONDS=3600 bash scripts/run_roundingsat_e1_g4_branch_1h.sh
+```
+
 If the default CaDiCaL run also times out, use a bounded parameter portfolio
 instead of repeating the same command:
 

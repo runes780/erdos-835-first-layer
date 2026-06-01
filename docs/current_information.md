@@ -104,6 +104,11 @@ file size: 57M
 sha256: 690112c309acc78a7dd58fee800f5f8097f479bab6177b6179980f6a51b4269f
 ```
 
+This CNF is the baseline pairwise exact-one encoding plus symmetry unit
+clauses.  It does not include the OPB D lower-count equalities; that mismatch
+was caught in the later Pro-model audit and the documentation has been
+corrected.
+
 CaDiCaL was prepared locally without sudo by downloading and extracting the
 Ubuntu package into `artifacts/solvers/cadical_pkg`.  A 10-minute CaDiCaL smoke
 run reached `timeout` after 2,980,586 conflicts with peak RSS about 697MB.
@@ -139,6 +144,18 @@ Kissat is the best tested solver on this CNF so far, but it still did not
 decide `E_1`.  The current best next step is strategic review rather than
 another blind rerun: compare encodings, symmetry breaking, redundant
 constraints, and whether to move from `E_1` to another staged target.
+
+The next implemented experiment is the residual-orbit split proposed by the
+Pro-model audit.  The CNF generator now accepts extra branch units via
+`--force-d-block`, covering:
+
+```text
+Branch A: D:0,1,3,6,8
+Branch B: D:0,1,3,6,9
+```
+
+The ladder OPB generator now also supports `--add-g4-counts`, enabling E1
+branch OPBs with both D lower-count equalities and G4 equalities.
 
 The first D-only OPB has been generated with the triple-matching symmetry break
 and redundant D lower-count constraints:

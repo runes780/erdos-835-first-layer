@@ -848,3 +848,35 @@ Interpretation:
 - The useful next decision is strategic: ask a stronger model to review whether
   to add stronger symmetry/redundant constraints, change cardinality encoding,
   try another CDCL solver portfolio, or move to a different staged target.
+
+Pro-model audit and follow-up implementation:
+
+```text
+audit correction: the current E_1 CNF is not D-lower-count strengthened
+actual E_1 CNF: pairwise exact-one + triple/off-triple symmetry units
+OPB ladder before follow-up: supported D lower-count constraints, not G4
+```
+
+Implemented the recommended next scaffolding:
+
+```text
+CNF generator:
+  added --force-d-block for branch units
+  Branch A unit: D:0,1,3,6,8
+  Branch B unit: D:0,1,3,6,9
+  E_1 branch CNF stats: 74,613 variables, 3,607,769 clauses
+
+OPB ladder generator:
+  added --add-g4-counts
+  E_1 G4+D-lower branch OPB header:
+    * #variable= 74613 #constraint= 33892
+
+scripts:
+  scripts/export_problem835_e1_branch_cnfs.sh
+  scripts/export_problem835_e1_g4_branch_opbs.sh
+  scripts/run_kissat_e1_branch_2h.sh
+  scripts/run_roundingsat_e1_g4_branch_1h.sh
+```
+
+This keeps the unchanged CNF results separate from the next branch-split and
+G4-strengthened experiments.

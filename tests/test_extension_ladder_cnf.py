@@ -42,6 +42,17 @@ class ExtensionLadderCnfStatsTests(unittest.TestCase):
         self.assertEqual(stats.symmetry_unit_clauses, 10)
         self.assertEqual(stats.total_clauses, 3607768)
 
+    def test_problem_e1_branch_cnf_adds_one_unit_clause(self):
+        stats = compute_extension_ladder_cnf_stats(
+            OneColorConfig(v=21, t=4, extension_count=1),
+            symmetry_break="triple-matching-off-triple",
+            forced_d_blocks=[(0, 1, 3, 6, 8)],
+        )
+
+        self.assertEqual(stats.variables, 74613)
+        self.assertEqual(stats.symmetry_unit_clauses, 11)
+        self.assertEqual(stats.total_clauses, 3607769)
+
 
 class ExtensionLadderCnfExportTests(unittest.TestCase):
     def test_e1_toy_cnf_exports_dimacs_clauses(self):
@@ -63,6 +74,15 @@ class ExtensionLadderCnfExportTests(unittest.TestCase):
         lines = text.splitlines()
         self.assertEqual(lines[0], "p cnf 14 68")
         self.assertIn("-7 -11 0", lines)
+
+    def test_cnf_can_force_residual_orbit_branch_block(self):
+        config = OneColorConfig(v=7, t=4, extension_count=1)
+
+        text = export_extension_ladder_cnf(config, forced_d_blocks=[(0, 1, 2, 3, 4)])
+
+        lines = text.splitlines()
+        self.assertEqual(lines[0], "p cnf 28 225")
+        self.assertIn("1 0", lines)
 
 
 class ExtensionLadderCnfCliTests(unittest.TestCase):

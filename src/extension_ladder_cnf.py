@@ -8,8 +8,10 @@ from math import comb
 from pathlib import Path
 from typing import Iterable, Iterator, TextIO
 
-from src.erdos835_one_color import OneColorConfig, forced_symmetry_break_rows
+from src.erdos835_one_color import OneColorConfig
 from src.extension_ladder import (
+    _forced_ladder_rows,
+    _parse_block_text,
     _iter_d_star_constraints,
     _iter_disjointness_constraints,
     _iter_point_extension_constraints,
@@ -40,11 +42,12 @@ def _pairwise_exact_one_clause_count(length: int) -> int:
 def compute_extension_ladder_cnf_stats(
     config: OneColorConfig,
     symmetry_break: str | None = None,
+    forced_d_blocks: Iterable[Iterable[int]] | None = None,
 ) -> ExtensionLadderCnfStats:
     """Return DIMACS CNF counts for pairwise encoding of the E_m model."""
 
     config.validate()
-    forced_rows = forced_symmetry_break_rows(config, symmetry_break)
+    forced_rows = _forced_ladder_rows(config, symmetry_break, forced_d_blocks)
 
     d_rows = comb(config.v, config.t + 1)
     u_rows = comb(config.v, config.t + 2)
@@ -95,11 +98,12 @@ def _at_most_one_clauses(row_ids: Iterable[int]) -> Iterator[Clause]:
 def iter_extension_ladder_cnf_clauses(
     config: OneColorConfig,
     symmetry_break: str | None = None,
+    forced_d_blocks: Iterable[Iterable[int]] | None = None,
 ) -> Iterator[Clause]:
     """Yield DIMACS clauses for the staged E_m pairwise CNF encoding."""
 
     config.validate()
-    forced_rows = forced_symmetry_break_rows(config, symmetry_break)
+    forced_rows = _forced_ladder_rows(config, symmetry_break, forced_d_blocks)
     row_names, d_row_id_by_block, x_row_id_by_key = build_extension_ladder_row_index(config)
     row_id_by_name = {row_name: row_id for row_id, row_name in enumerate(row_names, start=1)}
 
@@ -125,25 +129,40 @@ def write_extension_ladder_cnf(
     config: OneColorConfig,
     output: TextIO,
     symmetry_break: str | None = None,
+    forced_d_blocks: Iterable[Iterable[int]] | None = None,
 ) -> None:
     """Write a DIMACS CNF file using pairwise exact-one constraints."""
 
-    stats = compute_extension_ladder_cnf_stats(config, symmetry_break=symmetry_break)
+    stats = compute_extension_ladder_cnf_stats(
+        config,
+        symmetry_break=symmetry_break,
+        forced_d_blocks=forced_d_blocks,
+    )
     output.write(f"p cnf {stats.variables} {stats.total_clauses}\n")
-    for clause in iter_extension_ladder_cnf_clauses(config, symmetry_break=symmetry_break):
+    for clause in iter_extension_ladder_cnf_clauses(
+        config,
+        symmetry_break=symmetry_break,
+        forced_d_blocks=forced_d_blocks,
+    ):
         _write_clause(output, clause)
 
 
 def export_extension_ladder_cnf(
     config: OneColorConfig,
     symmetry_break: str | None = None,
+    forced_d_blocks: Iterable[Iterable[int]] | None = None,
 ) -> str:
     """Return DIMACS text for tests and toy instances."""
 
     from io import StringIO
 
     buffer = StringIO()
-    write_extension_ladder_cnf(config, buffer, symmetry_break=symmetry_break)
+    write_extension_ladder_cnf(
+        config,
+        buffer,
+        symmetry_break=symmetry_break,
+        forced_d_blocks=forced_d_blocks,
+    )
     return buffer.getvalue()
 
 
@@ -161,6 +180,13 @@ def build_parser() -> argparse.ArgumentParser:
         default="none",
         help="append supported symmetry-breaking unit clauses",
     )
+    parser.add_argument(
+        "--force-d-block",
+        action="append",
+        default=[],
+        metavar="POINTS",
+        help="force one D block, e.g. 0,1,3,6,8; may be repeated",
+    )
     return parser
 
 
@@ -168,9 +194,14 @@ def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     config = OneColorConfig(v=args.v, t=args.t, extension_count=args.extension_count)
     symmetry_break = None if args.symmetry_break == "none" else args.symmetry_break
+    forced_d_blocks = [_parse_block_text(text) for text in args.force_d_block]
 
     if args.command == "stats":
-        stats = compute_extension_ladder_cnf_stats(config, symmetry_break=symmetry_break)
+        stats = compute_extension_ladder_cnf_stats(
+            config,
+            symmetry_break=symmetry_break,
+            forced_d_blocks=forced_d_blocks,
+        )
         if args.json:
             print(json.dumps(stats.to_dict(), indent=2, sort_keys=True))
         else:
@@ -181,11 +212,21 @@ def main(argv: list[str] | None = None) -> int:
         if args.output is None:
             import sys
 
-            write_extension_ladder_cnf(config, sys.stdout, symmetry_break=symmetry_break)
+            write_extension_ladder_cnf(
+                config,
+                sys.stdout,
+                symmetry_break=symmetry_break,
+                forced_d_blocks=forced_d_blocks,
+            )
         else:
             args.output.parent.mkdir(parents=True, exist_ok=True)
             with args.output.open("w", encoding="utf-8", newline="\n") as output:
-                write_extension_ladder_cnf(config, output, symmetry_break=symmetry_break)
+                write_extension_ladder_cnf(
+                    config,
+                    output,
+                    symmetry_break=symmetry_break,
+                    forced_d_blocks=forced_d_blocks,
+                )
         return 0
 
     raise AssertionError(f"unhandled command {args.command}")

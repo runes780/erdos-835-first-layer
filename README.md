@@ -138,8 +138,10 @@ TIME_LIMIT_SECONDS=7200 bash scripts/run_cadical_e1_2h.sh
 ```
 
 This exports a pairwise DIMACS encoding with 74,613 variables and 3,607,768
-clauses.  CaDiCaL can be used from `artifacts/solvers/cadical_pkg/usr/bin` if
-the local package has been downloaded and extracted.
+clauses.  This baseline CNF has the triple/off-triple symmetry units, but it
+does not include the OPB-only D lower-count constraints.  CaDiCaL can be used
+from `artifacts/solvers/cadical_pkg/usr/bin` if the local package has been
+downloaded and extracted.
 
 After a default CaDiCaL timeout, run a small parameter portfolio:
 
@@ -148,6 +150,23 @@ SKIP_BASELINE=1 MAX_JOBS=6 TIME_LIMIT_SECONDS=3600 \
   PREFIX=e1_cadical_portfolio_1h \
   MANIFEST=artifacts/solver_logs/e1_cadical_portfolio_1h.jsonl \
   bash scripts/run_cadical_portfolio.sh
+```
+
+Generate the two residual-orbit branch CNFs recommended after the Kissat
+timeout:
+
+```bash
+bash scripts/export_problem835_e1_branch_cnfs.sh
+BRANCH=a TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e1_branch_2h.sh
+BRANCH=b TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e1_branch_2h.sh
+```
+
+Generate the G4-strengthened OPB branches:
+
+```bash
+bash scripts/export_problem835_e1_g4_branch_opbs.sh
+BRANCH=a TIME_LIMIT_SECONDS=3600 bash scripts/run_roundingsat_e1_g4_branch_1h.sh
+BRANCH=b TIME_LIMIT_SECONDS=3600 bash scripts/run_roundingsat_e1_g4_branch_1h.sh
 ```
 
 For the 32GB i5-13400 Windows PC, see `docs/pc_execution.md` and
@@ -174,6 +193,10 @@ If this repo is opened by Codex on the Windows PC, start from `TASKS.md`.
   export.
 - `scripts/export_problem835_e1_cnf.sh`: pairwise DIMACS CNF export for the
   first staged extension-ladder target.
+- `scripts/export_problem835_e1_branch_cnfs.sh`: residual-orbit branch CNFs
+  with `D:0,1,3,6,8` and `D:0,1,3,6,9`.
+- `scripts/export_problem835_e1_g4_branch_opbs.sh`: E1 branch OPBs with D
+  lower counts and G4 equalities.
 - `scripts/run_roundingsat_lp0_augmented_6h.sh`: bounded RoundingSat run using
   `--lp=0`.
 - `scripts/run_roundingsat_d_only_2h.sh`: bounded RoundingSat run for the
@@ -182,6 +205,10 @@ If this repo is opened by Codex on the Windows PC, start from `TASKS.md`.
 - `scripts/run_cadical_e1_2h.sh`: bounded CaDiCaL run for the `E_1` CNF.
 - `scripts/run_cadical_portfolio.sh`: launch a bounded portfolio of
   independent CaDiCaL CNF variants.
+- `scripts/run_kissat_e1_branch_2h.sh`: bounded Kissat run for an E1 branch
+  CNF.
+- `scripts/run_roundingsat_e1_g4_branch_1h.sh`: bounded RoundingSat run for a
+  G4-strengthened E1 branch OPB.
 - `scripts/run_roundingsat_portfolio.sh`: launch a bounded portfolio of
   independent RoundingSat variants.
 - `TASKS.md`: handoff task brief for Codex on the Windows PC.

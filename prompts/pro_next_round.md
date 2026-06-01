@@ -64,7 +64,7 @@ encoding: pairwise exact-one DIMACS
 symmetry:
   - triple matching through {0,1,2}
   - off-triple block D:{0,1,3,5,7}
-  - redundant D lower-count constraints for subset sizes 0,1,2,3
+redundant D lower-count constraints: not included in this CNF
 CNF sha256: 690112c309acc78a7dd58fee800f5f8097f479bab6177b6179980f6a51b4269f
 ```
 
@@ -114,6 +114,15 @@ Kissat 4.0.4 2h CNF:
 ```
 
 No SAT witness and no UNSAT certificate have been found.
+
+Pro-model audit correction already incorporated:
+
+```text
+The current E_1 CNF is pairwise exact-one plus symmetry unit clauses only.
+It does not contain D lower-count constraints.  The OPB E_1 generator supports
+D lower counts; the ladder OPB generator now also supports G4 counts.
+The CNF generator now supports branch unit clauses via --force-d-block.
+```
 
 Task:
 

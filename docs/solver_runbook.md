@@ -123,6 +123,10 @@ bash scripts/export_problem835_e1_cnf.sh
 TIME_LIMIT_SECONDS=7200 bash scripts/run_cadical_e1_2h.sh
 ```
 
+This CNF is pairwise exact-one plus symmetry units only.  It intentionally does
+not include D lower-count equalities; use the OPB ladder for those constraints,
+or a later bounded-cardinality CNF encoding.
+
 If the default CaDiCaL run times out, run a bounded parameter portfolio:
 
 ```bash
@@ -135,6 +139,26 @@ SKIP_BASELINE=1 MAX_JOBS=6 TIME_LIMIT_SECONDS=3600 \
 Start with six CaDiCaL jobs on the 32GB PC.  The default 2-hour CaDiCaL run
 peaked below 1GB RSS, so this uses more CPU while still leaving a large memory
 margin.
+
+After the Kissat timeout on the unchanged E1 CNF, generate the two
+residual-orbit branches:
+
+```bash
+bash scripts/export_problem835_e1_branch_cnfs.sh
+BRANCH=a TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e1_branch_2h.sh
+BRANCH=b TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e1_branch_2h.sh
+```
+
+The two branch units are `D:0,1,3,6,8` and `D:0,1,3,6,9`.  Both branches must
+be covered before drawing any global conclusion.
+
+For the compact PB version with extra G4 equalities:
+
+```bash
+bash scripts/export_problem835_e1_g4_branch_opbs.sh
+BRANCH=a TIME_LIMIT_SECONDS=3600 bash scripts/run_roundingsat_e1_g4_branch_1h.sh
+BRANCH=b TIME_LIMIT_SECONDS=3600 bash scripts/run_roundingsat_e1_g4_branch_1h.sh
+```
 
 ## What to log
 

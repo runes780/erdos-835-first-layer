@@ -15,10 +15,13 @@ from src.erdos835_one_color import (
     _d_row_name,
     _d_lower_count_rhs,
     _extensions,
+    _g4_count_rhs,
     _iter_d_lower_count_constraints,
+    _iter_g4_count_constraints,
     _x_row_name,
     forced_symmetry_break_rows,
     iter_comb_tuples,
+    normalize_block,
 )
 
 
@@ -126,6 +129,24 @@ def build_extension_ladder_row_index(
     return row_names, d_row_id_by_block, x_row_id_by_key
 
 
+def _parse_block_text(text: str) -> Block:
+    try:
+        return tuple(int(part) for part in text.split(",") if part != "")
+    except ValueError as exc:
+        raise ValueError(f"invalid block {text!r}") from exc
+
+
+def _forced_ladder_rows(
+    config: OneColorConfig,
+    symmetry_break: str | None,
+    forced_d_blocks: Iterable[Iterable[int]] | None = None,
+) -> tuple[str, ...]:
+    rows: list[str] = list(forced_symmetry_break_rows(config, symmetry_break))
+    for block in forced_d_blocks or ():
+        rows.append(_d_row_name(normalize_block(block, config.t + 1, config.v)))
+    return tuple(dict.fromkeys(rows))
+
+
 def _write_pb_constraint(
     output: TextIO,
     row_ids: Iterable[int],
@@ -182,17 +203,22 @@ def write_extension_ladder_opb(
     include_column_comments: bool = True,
     symmetry_break: str | None = None,
     add_d_lower_counts: bool = False,
+    add_g4_counts: bool = False,
+    forced_d_blocks: Iterable[Iterable[int]] | None = None,
 ) -> None:
     """Write the staged E_m pseudo-Boolean model in OPB format."""
 
     config.validate()
-    forced_rows = forced_symmetry_break_rows(config, symmetry_break)
+    forced_rows = _forced_ladder_rows(config, symmetry_break, forced_d_blocks)
     stats = compute_extension_ladder_stats(config)
     extra_constraint_count = len(forced_rows)
     if add_d_lower_counts:
         for r in range(4):
             _d_lower_count_rhs(config, r)
             extra_constraint_count += comb(config.v, r)
+    if add_g4_counts:
+        _g4_count_rhs(config)
+        extra_constraint_count += config.extension_count * comb(config.v, 4)
     constraint_count = stats.total_constraints + extra_constraint_count
 
     row_names, d_row_id_by_block, x_row_id_by_key = build_extension_ladder_row_index(config)
@@ -227,6 +253,10 @@ def write_extension_ladder_opb(
         for name, row_ids, rhs in _iter_d_lower_count_constraints(config, row_id_by_name):
             _write_pb_constraint(output, row_ids, "=", rhs, name, include_column_comments)
 
+    if add_g4_counts:
+        for name, row_ids, rhs in _iter_g4_count_constraints(config, row_id_by_name):
+            _write_pb_constraint(output, row_ids, "=", rhs, name, include_column_comments)
+
 
 def export_extension_ladder_opb(
     config: OneColorConfig,
@@ -234,6 +264,8 @@ def export_extension_ladder_opb(
     include_column_comments: bool = True,
     symmetry_break: str | None = None,
     add_d_lower_counts: bool = False,
+    add_g4_counts: bool = False,
+    forced_d_blocks: Iterable[Iterable[int]] | None = None,
 ) -> str:
     """Return OPB text for tests and small toy instances."""
 
@@ -247,6 +279,8 @@ def export_extension_ladder_opb(
         include_column_comments=include_column_comments,
         symmetry_break=symmetry_break,
         add_d_lower_counts=add_d_lower_counts,
+        add_g4_counts=add_g4_counts,
+        forced_d_blocks=forced_d_blocks,
     )
     return buffer.getvalue()
 
@@ -273,6 +307,18 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="append redundant D lower-subset count constraints for r=0,1,2,3",
     )
+    parser.add_argument(
+        "--add-g4-counts",
+        action="store_true",
+        help="append redundant G_j 4-set count constraints to the staged ladder OPB",
+    )
+    parser.add_argument(
+        "--force-d-block",
+        action="append",
+        default=[],
+        metavar="POINTS",
+        help="force one D block, e.g. 0,1,3,6,8; may be repeated",
+    )
     return parser
 
 
@@ -292,6 +338,7 @@ def main(argv: list[str] | None = None) -> int:
         include_row_comments = not (args.no_comments or args.no_row_comments)
         include_column_comments = not (args.no_comments or args.no_column_comments)
         symmetry_break = None if args.symmetry_break == "none" else args.symmetry_break
+        forced_d_blocks = [_parse_block_text(text) for text in args.force_d_block]
         if args.output is None:
             import sys
 
@@ -302,6 +349,8 @@ def main(argv: list[str] | None = None) -> int:
                 include_column_comments=include_column_comments,
                 symmetry_break=symmetry_break,
                 add_d_lower_counts=args.add_d_lower_counts,
+                add_g4_counts=args.add_g4_counts,
+                forced_d_blocks=forced_d_blocks,
             )
         else:
             args.output.parent.mkdir(parents=True, exist_ok=True)
@@ -313,6 +362,8 @@ def main(argv: list[str] | None = None) -> int:
                     include_column_comments=include_column_comments,
                     symmetry_break=symmetry_break,
                     add_d_lower_counts=args.add_d_lower_counts,
+                    add_g4_counts=args.add_g4_counts,
+                    forced_d_blocks=forced_d_blocks,
                 )
         return 0
 
