@@ -901,3 +901,14 @@ Branch B command: BRANCH=b TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e1_br
 Branch B log: artifacts/solver_logs/e1_kissat_branch_b_2h.log
 initial status: both kissat processes running
 ```
+
+Prepared Experiment 2 inputs while Experiment 1 runs:
+
+```text
+command: bash scripts/export_problem835_e1_g4_branch_opbs.sh
+Branch A OPB: artifacts/problem835_e1_g4_branch_a.opb
+Branch A sha256: c3f9a2bd19b5e679cbb27c3f050918fc62dc7d371d6df74e12815b6b5283c877
+Branch B OPB: artifacts/problem835_e1_g4_branch_b.opb
+Branch B sha256: 29624253257a942fdb8226d84d87035d743a087730acf58152299823dc988598
+per-branch header: * #variable= 74613 #constraint= 33892
+```
