@@ -880,3 +880,24 @@ scripts:
 
 This keeps the unchanged CNF results separate from the next branch-split and
 G4-strengthened experiments.
+
+Started Experiment 1, the residual-orbit `E_1` CNF split:
+
+```text
+command: bash scripts/export_problem835_e1_branch_cnfs.sh
+Branch A CNF: artifacts/problem835_e1_branch_a.cnf
+Branch A sha256: 43e921ec164edc86f5e3937d3902f38bb47a9ceadf4d845aabd58b41217c45d3
+Branch B CNF: artifacts/problem835_e1_branch_b.cnf
+Branch B sha256: f89b9ba94d31e91fd1851ada595bf65418e121883fab3fee5abc9ee4330fd41a
+per-branch stats: 74,613 variables, 3,607,769 clauses
+```
+
+Launched both Kissat branch runs:
+
+```text
+Branch A command: BRANCH=a TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e1_branch_2h.sh
+Branch A log: artifacts/solver_logs/e1_kissat_branch_a_2h.log
+Branch B command: BRANCH=b TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e1_branch_2h.sh
+Branch B log: artifacts/solver_logs/e1_kissat_branch_b_2h.log
+initial status: both kissat processes running
+```
