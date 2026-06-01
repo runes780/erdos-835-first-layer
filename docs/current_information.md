@@ -157,6 +157,17 @@ Branch B: D:0,1,3,6,9
 The ladder OPB generator now also supports `--add-g4-counts`, enabling E1
 branch OPBs with both D lower-count equalities and G4 equalities.
 
+The two residual-orbit Kissat branch CNFs both reached timeout:
+
+```text
+Branch A D:0,1,3,6,8: 48,117,911 conflicts, peak RSS 265,716 KB
+Branch B D:0,1,3,6,9: 47,834,751 conflicts, peak RSS 250,580 KB
+```
+
+No SAT witness or UNSAT certificate was produced, so the active next step is
+the Pro-recommended Experiment 2: run the G4-strengthened branch OPBs with
+RoundingSat `--lp=0`.
+
 The first D-only OPB has been generated with the triple-matching symmetry break
 and redundant D lower-count constraints:
 

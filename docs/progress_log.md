@@ -912,3 +912,40 @@ Branch B OPB: artifacts/problem835_e1_g4_branch_b.opb
 Branch B sha256: 29624253257a942fdb8226d84d87035d743a087730acf58152299823dc988598
 per-branch header: * #variable= 74613 #constraint= 33892
 ```
+
+Final result of Experiment 1, the residual-orbit `E_1` CNF split:
+
+```text
+Branch A result classification: UNKNOWN / timeout
+Branch A conflicts: 48,117,911
+Branch A decisions: 839,688,559
+Branch A propagations: 40,541,872,067
+Branch A peak RSS: 265,716 KB
+Branch A wall time: 2:00:00
+
+Branch B result classification: UNKNOWN / timeout
+Branch B conflicts: 47,834,751
+Branch B decisions: 826,186,962
+Branch B propagations: 39,861,209,252
+Branch B peak RSS: 250,580 KB
+Branch B wall time: 2:00:00
+```
+
+Interpretation:
+
+- No SAT witness and no UNSAT certificate.
+- The branch split did not decide `E_1` under the current pairwise CNF in a
+  2-hour Kissat run.
+- This matches the Pro-model decision tree: proceed to Experiment 2, the
+  G4-strengthened branch OPBs, instead of repeating the unchanged CNF run.
+
+Started Experiment 2, the G4-strengthened branch OPB run:
+
+```text
+Branch A command: BRANCH=a TIME_LIMIT_SECONDS=3600 bash scripts/run_roundingsat_e1_g4_branch_1h.sh
+Branch A log: artifacts/solver_logs/e1_g4_branch_a_roundingsat_lp0_1h.log
+Branch B command: BRANCH=b TIME_LIMIT_SECONDS=3600 bash scripts/run_roundingsat_e1_g4_branch_1h.sh
+Branch B log: artifacts/solver_logs/e1_g4_branch_b_roundingsat_lp0_1h.log
+initial status: both roundingsat processes running
+initial memory: about 843MiB used in WSL, 0B swap
+```
