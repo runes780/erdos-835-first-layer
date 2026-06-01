@@ -111,6 +111,76 @@ class OneColorStatsTests(unittest.TestCase):
         self.assertNotIn("* row 1 D:0,1", text)
         self.assertIn("+1 x1 +1 x2 +1 x3 = 1 ; * T:0", text)
 
+    def test_opb_export_can_omit_all_non_header_comments_for_solvers(self):
+        config = OneColorConfig(v=4, t=1, extension_count=1)
+
+        text = export_opb(
+            config,
+            include_row_comments=False,
+            include_column_comments=False,
+        )
+
+        lines = text.splitlines()
+        self.assertEqual(lines[0], "* #variable= 10 #constraint= 14")
+        self.assertTrue(all(line.startswith("* #") or " * " not in line for line in lines))
+        self.assertIn("+1 x1 +1 x2 +1 x3 = 1 ;", lines)
+
+    def test_opb_export_can_force_triple_matching_symmetry_break(self):
+        config = OneColorConfig(v=7, t=4, extension_count=1)
+
+        text = export_opb(config, symmetry_break="triple-matching")
+
+        lines = text.splitlines()
+        self.assertEqual(lines[0], "* #variable= 28 #constraint= 65")
+        self.assertTrue(any(line.endswith("; * force:D:0,1,2,3,4") for line in lines))
+        self.assertTrue(any(line.endswith("; * force:D:0,1,2,5,6") for line in lines))
+
+    def test_opb_export_can_force_triple_matching_with_off_triple_block(self):
+        config = OneColorConfig(v=9, t=4, extension_count=1)
+
+        text = export_opb(config, symmetry_break="triple-matching-off-triple")
+
+        lines = text.splitlines()
+        self.assertEqual(lines[0], "* #variable= 210 #constraint= 340")
+        self.assertTrue(any(line.endswith("; * force:D:0,1,2,3,4") for line in lines))
+        self.assertTrue(any(line.endswith("; * force:D:0,1,2,5,6") for line in lines))
+        self.assertTrue(any(line.endswith("; * force:D:0,1,2,7,8") for line in lines))
+        self.assertTrue(any(line.endswith("; * force:D:0,1,3,5,7") for line in lines))
+
+    def test_opb_export_can_add_g4_count_constraints(self):
+        config = OneColorConfig(v=7, t=4, extension_count=1)
+
+        text = export_opb(config, add_g4_counts=True)
+
+        lines = text.splitlines()
+        self.assertEqual(lines[0], "* #variable= 28 #constraint= 98")
+        g4_line = next(line for line in lines if line.endswith("; * G4:0:0,1,2,3"))
+        self.assertEqual(g4_line.count("+1 x"), 3)
+        self.assertIn(" = 1 ;", g4_line)
+
+    def test_g4_count_constraints_are_only_for_the_problem_strength(self):
+        config = OneColorConfig(v=6, t=1, extension_count=2)
+
+        with self.assertRaisesRegex(ValueError, "G4 count constraints require t=4"):
+            export_opb(config, add_g4_counts=True)
+
+    def test_opb_export_can_add_d_lower_count_constraints(self):
+        config = OneColorConfig(v=11, t=4, extension_count=1)
+
+        text = export_opb(config, add_d_lower_counts=True)
+
+        lines = text.splitlines()
+        self.assertEqual(lines[0], "* #variable= 924 #constraint= 1486")
+        d3_line = next(line for line in lines if line.endswith("; * D3:0,1,2"))
+        self.assertEqual(d3_line.count("+1 x"), 28)
+        self.assertIn(" = 4 ;", d3_line)
+
+    def test_d_lower_count_constraints_are_only_for_the_problem_strength(self):
+        config = OneColorConfig(v=6, t=1, extension_count=2)
+
+        with self.assertRaisesRegex(ValueError, "D lower count constraints require t=4"):
+            export_opb(config, add_d_lower_counts=True)
+
 
 class OneColorVerifierTests(unittest.TestCase):
     def test_toy_candidate_satisfies_all_exact_cover_constraints(self):

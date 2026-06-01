@@ -10,8 +10,11 @@ Run the first-stage computational experiment for Erdős problem 835:
 
 1. verify the repository works on the Windows/WSL machine;
 2. export the one-colour exact-cover OPB instance;
-3. try a bounded solver run if a compatible OPB/PB solver is available;
-4. record enough evidence for the next mathematical decision.
+3. export the strengthened OPB instance after the raw smoke export;
+4. if the strengthened instance times out, switch to the staged `E_m` ladder,
+   starting with `E_1`;
+5. try a bounded `--lp=0` solver run if RoundingSat is available;
+6. record enough evidence for the next mathematical decision.
 
 Do not attempt the full seventeen-colour global model in this first run.
 
@@ -23,7 +26,7 @@ Do not attempt the full seventeen-colour global model in this first run.
 - Keep generated files under `artifacts/`.
 - Do not commit generated OPB files or solver logs unless the user explicitly
   asks.
-- Use strict time and memory budgets for the first raw solve.
+- Use strict time and memory budgets for the strengthened solve.
 
 Recommended first solver budget:
 
@@ -85,6 +88,16 @@ cat artifacts/problem835_stats.json
 Expected OPB size from the Mac export was about 56MB.  Small differences in
 line endings are acceptable, but the statistics must match the README.
 
+Then export the strengthened instance:
+
+```bash
+bash scripts/export_problem835_augmented_opb.sh
+```
+
+This appends the triple-matching symmetry break and the redundant
+`G_j` 4-set count constraints, plus the redundant \(D_a\) lower-subset count
+constraints for subset sizes 0, 1, 2, and 3.
+
 ## Step 4: find an available solver
 
 Check for common pseudo-Boolean / OPB solvers:
@@ -105,19 +118,18 @@ record the exact install command and solver version.
 
 ## Step 5: run one bounded solver attempt
 
-Use the solver's own timeout option if available.  Otherwise use Linux
-`timeout`.  Keep logs in `artifacts/`.
+Use RoundingSat with LP disabled unless a later benchmark gives a better
+setting.  Keep logs in `artifacts/solver_logs/`.
 
 Template:
 
 ```bash
 mkdir -p artifacts/solver_logs
-/usr/bin/time -v timeout 6h SOLVER_COMMAND artifacts/problem835_one_color.opb \
-  > artifacts/solver_logs/raw_one_colour_6h.log 2>&1
+TIME_LIMIT_SECONDS=21600 bash scripts/run_roundingsat_lp0_augmented_6h.sh
 ```
 
-Replace `SOLVER_COMMAND` with the actual solver command.  Do not run an
-unbounded job.
+For a short test run, set `TIME_LIMIT_SECONDS=600` and a distinct `LOG=...`.
+Do not run an unbounded job.
 
 During the run, monitor memory in another shell:
 
@@ -132,7 +144,7 @@ Stop the run if memory pressure causes heavy swap.
 After the solver exits, inspect the log:
 
 ```bash
-tail -100 artifacts/solver_logs/raw_one_colour_6h.log
+tail -100 artifacts/solver_logs/augmented_one_colour_roundingsat_lp0_6h.log
 ```
 
 Classify as exactly one of:
@@ -177,13 +189,40 @@ If the result is SAT:
 
 If the result is timeout or memory failure:
 
-1. do not keep rerunning the same raw model;
-2. move to fixed-\(D_a\), symmetry breaking, or smaller derived subsystems;
-3. use `prompts/pro_next_round.md` to ask for stronger hand constraints.
+1. do not keep rerunning the same model without changing constraints or solver settings;
+2. move to the staged `E_m` ladder, starting with `E_1`;
+3. use D-only, fixed-\(D_a\), and symmetry-breaking runs as auxiliary derived
+   subsystems;
+4. use `prompts/pro_next_round.md` to ask for stronger hand constraints.
 
 ## Current expected outcome
 
-The most likely first outcome is UNKNOWN/timeout, not a decisive SAT/UNSAT.
-That is still useful: it tells us whether the raw one-colour OPB model is easy
-enough for the 32GB PC or whether the next step must be mathematical reduction.
+The first raw RoundingSat run already ended UNKNOWN/timeout, with LP time as
+the bottleneck rather than RAM.  The current expected outcome is still probably
+UNKNOWN/timeout.  The strengthened `--lp=0` portfolio also timed out, so the
+current active benchmark is the staged `E_1` OPB:
 
+```bash
+bash scripts/export_problem835_e1_opb.sh
+TIME_LIMIT_SECONDS=7200 bash scripts/run_roundingsat_e1_2h.sh
+```
+
+If the `E_1` OPB portfolio times out, switch to the pairwise CNF/CDCL route:
+
+```bash
+bash scripts/export_problem835_e1_cnf.sh
+TIME_LIMIT_SECONDS=7200 bash scripts/run_cadical_e1_2h.sh
+```
+
+The local CaDiCaL binary may be unpacked under
+`artifacts/solvers/cadical_pkg/usr/bin/cadical`.
+
+If the default CaDiCaL run also times out, use a bounded parameter portfolio
+instead of repeating the same command:
+
+```bash
+SKIP_BASELINE=1 MAX_JOBS=6 TIME_LIMIT_SECONDS=3600 \
+  PREFIX=e1_cadical_portfolio_1h \
+  MANIFEST=artifacts/solver_logs/e1_cadical_portfolio_1h.jsonl \
+  bash scripts/run_cadical_portfolio.sh
+```

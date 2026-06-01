@@ -1,6 +1,6 @@
 # Current information summary
 
-Date: 2026-05-31
+Date: 2026-06-01
 
 This document records the working state of the Erdős problem 835 investigation
 captured in this repository.  It is a working record, not a claim of a solution.
@@ -26,10 +26,133 @@ The working assumptions from the previous reductions are:
   \(LS(4,5,21)\) map \(D\) and eleven point-extension maps \(g_j\) on 6-sets.
 - Fixing one colour \(a\in\mathbb F_{17}\) gives a pure exact-cover system.
 
-The one-colour exact-cover system is the current computational target.  If it
-is UNSAT, then the \(k=16\) first-layer object cannot exist.  If it is SAT, the
-one-colour shadow alone is not enough; the next task is to understand whether
-seventeen compatible colours can be assembled.
+The one-colour exact-cover system remains the certifiable target, but the
+active computation now attacks it through a staged extension ladder \(E_m\).
+If any necessary stage is UNSAT, then the \(k=16\) first-layer object cannot
+exist.  If a stage is SAT, it only says that weaker shadow is consistent.
+
+The current strengthened version keeps the same Boolean rows but appends two
+auditable families of constraints:
+
+- a safe triple-matching symmetry break through `{0,1,2}`;
+- redundant relative-design constraints
+  `sum_{U superset T} x_{j,U}=8` for every extension layer `j` and every 4-set
+  `T`.
+- redundant \(D_a\) lower-subset count constraints for subset sizes
+  0, 1, 2, and 3.
+
+The strengthened one-colour OPB has now been tested with a baseline run,
+a portfolio run, and one automatic follow-up portfolio.  All attempts reached
+`TIMELIMIT`; no SAT witness or UNSAT certificate was produced.  The best
+observed branch was `lubybase15`, reaching 15,372,000 conflicts in the
+follow-up run.
+
+The post-timeout route has been revised after the later planning discussion:
+
+1. `E_1`: \(D_a\) plus one point-extension family.
+2. `E_2`, `E_4`, `E_8`: add more extension families with cross-family
+   disjointness.
+3. `E_11`: recover the staged one-colour shadow.
+4. D-only and fixed-\(D_a\) conditional searches remain auxiliary diagnostics.
+
+The first `E_1` OPB was generated with the triple-matching symmetry break:
+
+```text
+variables: 74613
+constraints: 26343
+file size: 4.4M
+sha256: a24524b5d26534bfcf45095a9a924ee7af48d4724116eb6534a924d0756ef7b8
+```
+
+A 5-minute RoundingSat `--lp=0` smoke run on this `E_1` instance reached
+`s TIMELIMIT` after 875,035 conflicts.  Peak RSS was about 174MB with 0 swap.
+This produced no mathematical conclusion, but it confirms that `E_1` is
+lightweight enough for a wider portfolio.
+
+The active `E_1` export now uses the stronger safe normalization:
+
+- triple matching through `{0,1,2}`;
+- off-triple block `D:0,1,3,5,7`;
+- redundant D lower-count constraints for subset sizes 0, 1, 2, and 3.
+
+The regenerated stronger file has:
+
+```text
+variables: 74613
+constraints: 27906
+file size: 9.2M
+sha256: 94126fe65c3bd94d2a036eddbabb18e55d58f42cd6795abb2ba84662a40cc21e
+```
+
+A 10-minute six-way portfolio on this stronger `E_1` instance also reached
+`TIMELIMIT` on every branch.  The best branch was `lubybase15`, with 1,079,995
+conflicts and peak RSS about 129MB.
+
+A follow-up 2-hour ten-way portfolio also reached `TIMELIMIT` on every branch.
+The best branch was again `lubybase15`, with 5,250,782 conflicts and peak RSS
+about 231MB.  Memory remained healthy and swap stayed at 0B.  This points away
+from longer identical OPB/RoundingSat runs as the immediate next step; the next
+main experiment should be a CNF/CDCL encoding of `E_1`.
+
+The CNF/CDCL route is now operational.  The generated pairwise DIMACS instance
+has:
+
+```text
+variables: 74613
+clauses: 3607768
+file size: 57M
+sha256: 690112c309acc78a7dd58fee800f5f8097f479bab6177b6179980f6a51b4269f
+```
+
+CaDiCaL was prepared locally without sudo by downloading and extracting the
+Ubuntu package into `artifacts/solvers/cadical_pkg`.  A 10-minute CaDiCaL smoke
+run reached `timeout` after 2,980,586 conflicts with peak RSS about 697MB.
+A 2-hour CaDiCaL baseline also reached timeout:
+
+```text
+conflicts: 34,615,957
+decisions: 101,541,116
+propagations: 22,753,179,630
+peak RSS: 930,980 KB
+swap: 0
+```
+
+No SAT witness or UNSAT certificate has been found.  A 9-branch, 1-hour
+CaDiCaL portfolio completed with timeout on every branch.  The best branch by
+conflicts was `preprocess1_optimize1` with 3,942,942 conflicts in one hour;
+memory stayed safe, with each branch below about 762MB RSS and swap at 0.
+
+Kissat 4.0.4 was then installed from the official Linux amd64 release binary.
+On the same `E_1` CNF, a 10-minute smoke run also timed out, but reached
+4,860,049 conflicts with about 222MB reported RSS.  A follow-up 2-hour Kissat
+run also timed out:
+
+```text
+conflicts: 57,070,395
+decisions: 880,874,492
+propagations: 48,143,111,456
+peak RSS: 229,012 KB
+swap: 0
+```
+
+Kissat is the best tested solver on this CNF so far, but it still did not
+decide `E_1`.  The current best next step is strategic review rather than
+another blind rerun: compare encodings, symmetry breaking, redundant
+constraints, and whether to move from `E_1` to another staged target.
+
+The first D-only OPB has been generated with the triple-matching symmetry break
+and redundant D lower-count constraints:
+
+```text
+variables: 20349
+constraints: 7556
+file size: 5.8M
+```
+
+A 10-minute RoundingSat `--lp=0` smoke run on this D-only instance reached
+`s TIMELIMIT` after about 1.486M conflicts with peak RSS about 220MB.  This did
+not prove anything mathematically, but it confirms the smaller target is
+lightweight enough for stronger symmetry-breaking and encoding experiments.
 
 ## One-colour exact-cover formulation
 
@@ -152,11 +275,30 @@ memory soft limit: 24-28GB
 If there is no useful progress within that range, switch to smaller derived
 subsystems instead of letting the raw run consume days.
 
+Observed on the Windows PC with RoundingSat:
+
+```text
+raw 2-hour run: UNKNOWN / timeout
+peak RSS: about 1.6GB
+LP total time: 2747.5s
+short benchmark: --lp=0 gives far more conflicts/decisions per minute
+```
+
+Those observations led to the strengthened OPB and `--lp=0` portfolio runs.
+The strengthened portfolio also timed out, so the next solver experiments
+should move to smaller D-only and fixed-D conditional targets before returning
+to the full one-colour shadow.
+The revised plan is more specific: move first through the `E_m` ladder, using
+D-only and fixed-D runs for diagnostics and symmetry-breaking evidence.
+
 ## Current repository status
 
 Implemented:
 
 - parameter model and exact-cover statistics;
+- staged \(E_m\) extension-ladder stats and OPB export;
+- D-only OPB export and D-only verifier;
+- fixed-\(D_a\) conditional one-colour stats and OPB export;
 - sparse exact-cover row generator;
 - OPB export;
 - candidate verifier for one-colour solutions;
@@ -170,12 +312,14 @@ Verified locally:
 - unit tests pass;
 - smoke script passes;
 - full OPB export succeeds;
-- LaTeX note compiles.
+- LaTeX note compilation was not re-verified on this Windows/WSL setup because
+  `pdflatex` is not installed.
 
 Not done:
 
-- no solver result yet;
+- no SAT witness or UNSAT certificate from the strengthened one-colour runs;
 - no SAT witness;
 - no UNSAT certificate;
 - no public claim of solution.
-
+- no combined 17-colour first-layer CNF yet; this is documented as a later,
+  much larger target.

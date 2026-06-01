@@ -1,67 +1,141 @@
 # Prompt for the next Pro-model round
 
-You already have the context of our discussion on Erdős problem 835.  Do not
-browse the web.  Work only from the mathematical reductions already in context
-and from the exact-cover formulation below.
+Do not browse the web.  Work only from the reductions and computational data
+below.
 
-Goal: try to make real progress on the \(k=16\) first-layer obstruction.
+We are studying Erdős problem 835, first serious remaining case \(k=16\).  The
+current route is:
 
-We are at the following concrete subproblem.  Let \(V\) have 21 points.  For one
-fixed colour \(a\), introduce Boolean variables
+```text
+k=16 coloring
+  -> first-layer object on 21 points over F_17
+  -> one-colour exact-cover shadow
+  -> staged extension ladder E_m
+```
+
+The decisive one-colour shadow uses variables
 
 \[
 d_S\quad(S\in {V\choose 5}),\qquad
-x_{j,U}\quad(j=1,\ldots,11,\ U\in {V\choose 6}).
+x_{j,U}\quad(j=1,\ldots,11,\ U\in {V\choose 6}),
 \]
 
-They must satisfy:
+with constraints
 
 \[
-\sum_{S\supset T, |S|=5} d_S=1
-\quad\text{for every }T\in {V\choose 4},
+\sum_{S\supset T} d_S=1
+\quad(T\in {V\choose 4}),
 \]
 
 \[
 d_S+\sum_{v\in V\setminus S}x_{j,S\cup\{v\}}=1
-\quad\text{for every }j=1,\ldots,11,\ S\in {V\choose 5},
+\quad(j=1,\ldots,11,\ S\in {V\choose 5}),
 \]
 
 \[
-\sum_{j=1}^{11}x_{j,U}+\sum_{S\subset U, |S|=5}d_S=1
-\quad\text{for every }U\in {V\choose 6}.
+\sum_{j=1}^{11}x_{j,U}+
+\sum_{\substack{S\subset U\\ |S|=5}}d_S=1
+\quad(U\in {V\choose 6}).
 \]
 
-The instance has 617253 Boolean rows, 284088 exact-cover columns, and 4829496
-incidences.  All exact-cover columns have length 17.  If this one-colour
-instance is UNSAT, then the \(k=16\) first-layer object cannot exist.
+Full one-colour size:
 
-Please attack the problem directly.  I want one of the following, in order of
-preference:
+```text
+Boolean variables / rows: 617,253
+exact-cover columns: 284,088
+incidences: 4,829,496
+all exact-one lengths: 17
+```
 
-1. A rigorous hand obstruction proving this one-colour exact-cover system is
-   impossible.
-2. A smaller mathematically equivalent UNSAT core or derived subsystem, stated
-   precisely enough that it can be independently checked.
-3. A symmetry reduction or integer-linear formulation that is clearly stronger
-   than the raw exact-cover formulation.
-4. If the system appears satisfiable, a structural description of a solution or
-   a reason why satisfiability of the one-colour shadow does not help much.
+An UNSAT certificate for the full one-colour shadow would rule out the \(k=16\)
+first-layer object.
 
-Work style:
+We then introduced a staged necessary ladder.  \(E_1\) keeps \(D_a\) plus one
+point-extension family.  If \(E_1\) is UNSAT, then the full first-layer object
+is impossible.  If \(E_1\) is SAT or unknown, it only means this weaker stage is
+consistent or undecided.
 
-- Do not give a broad survey.
-- Do not spend effort explaining the original problem statement unless needed
-  for a proof step.
-- Use counting identities, double counting on small subsets, modular
-  restrictions, derived/residual designs, switching arguments, rank arguments
-  over finite fields, and exact-cover duality if useful.
-- Be explicit about which claims are proved and which are experimental or
-  conjectural.
-- If you propose computation, give exact variables, constraints, symmetry
-  breaking, and expected certificate format.
-- Prefer a short decisive obstruction over a long exploratory essay.
+Current `E_1` CNF:
 
-First task: derive every forced local counting identity for the one-colour
-system on \(r\)-subsets of \(V\), for \(r=0,\ldots,6\), and see whether any of
-them contradicts integrality, parity, or known parameters of \(S(4,5,21)\).
-If that does not close the problem, proceed to the strongest next attack.
+```text
+variables: 74,613
+clauses: 3,607,768
+encoding: pairwise exact-one DIMACS
+symmetry:
+  - triple matching through {0,1,2}
+  - off-triple block D:{0,1,3,5,7}
+  - redundant D lower-count constraints for subset sizes 0,1,2,3
+CNF sha256: 690112c309acc78a7dd58fee800f5f8097f479bab6177b6179980f6a51b4269f
+```
+
+Solver evidence so far:
+
+```text
+RoundingSat OPB E_1 5m:
+  timeout, 755k-875k conflicts range depending on strengthening
+
+RoundingSat stronger E_1 10-way 2h portfolio:
+  all timeout
+  best branch: 5,250,782 conflicts
+  peak RSS about 231MB
+
+CaDiCaL 10m CNF:
+  timeout
+  conflicts: 2,980,586
+  RSS: 696,880 KB
+
+CaDiCaL default 2h CNF:
+  timeout
+  conflicts: 34,615,957
+  decisions: 101,541,116
+  propagations: 22,753,179,630
+  peak RSS: 930,980 KB
+
+CaDiCaL 9-branch 1h parameter portfolio:
+  all timeout
+  best branch: -P1 -O1
+  best conflicts: 3,942,942
+  per-branch RSS below about 762MB
+
+Kissat 4.0.4 10m CNF:
+  timeout
+  conflicts: 4,860,049
+  decisions: 75,808,300
+  propagations: 4,219,292,529
+  RSS: 222 MB
+
+Kissat 4.0.4 2h CNF:
+  timeout
+  conflicts: 57,070,395
+  decisions: 880,874,492
+  propagations: 48,143,111,456
+  peak RSS: 229,012 KB
+  swap: 0
+```
+
+No SAT witness and no UNSAT certificate have been found.
+
+Task:
+
+Give a strategic recommendation for the next round.  Do not re-explain the
+original problem.  Focus on the `E_1`/one-colour computational attack.
+
+Please answer these directly:
+
+1. Is `E_1` still the right target, or should we move to `E_2`, D-only,
+   fixed-\(D_a\), or the full one-colour shadow?
+2. Is pairwise DIMACS exact-one still a reasonable encoding, or should we try
+   another encoding such as sequential counters, cardinality networks,
+   commander variables, XOR/rank constraints, or exact-cover/DLX-style search?
+3. What additional safe symmetry breaking is mathematically justified beyond
+   the current triple matching plus off-triple block?
+4. What redundant constraints are likely to help CDCL propagation without
+   changing satisfiability?
+5. Would you spend more CPU on Kissat, run a Kissat portfolio, try another
+   solver, or stop solver runs until the formulation is strengthened?
+6. Give the next concrete 3 experiments, with expected file sizes, time limits,
+   and what result would change the plan.
+
+Be strict: a timeout is not evidence of satisfiability or unsatisfiability.
+Prefer a smaller certifiable obstruction or stronger symmetry/redundancy over
+blindly increasing runtime.
