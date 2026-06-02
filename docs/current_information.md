@@ -164,9 +164,22 @@ Branch A D:0,1,3,6,8: 48,117,911 conflicts, peak RSS 265,716 KB
 Branch B D:0,1,3,6,9: 47,834,751 conflicts, peak RSS 250,580 KB
 ```
 
-No SAT witness or UNSAT certificate was produced, so the active next step is
-the Pro-recommended Experiment 2: run the G4-strengthened branch OPBs with
-RoundingSat `--lp=0`.
+No SAT witness or UNSAT certificate was produced, so the Pro-recommended
+Experiment 2 was run next: the G4-strengthened branch OPBs with RoundingSat
+`--lp=0`.
+
+The G4-strengthened branch OPBs also reached timeout:
+
+```text
+Branch A D:0,1,3,6,8: TIMELIMIT, 4,760,000 conflicts, peak RSS 397,556 KB
+Branch B D:0,1,3,6,9: TIMELIMIT, 4,658,000 conflicts, peak RSS 411,556 KB
+```
+
+No SAT witness or UNSAT certificate was produced.  Memory use stayed low, so
+this is a search-complexity result rather than a hardware/RAM failure.  The
+next Pro-model branch is Experiment 3: test `E_2` pairwise CNFs under the same
+two residual-orbit D branches before trying larger `E_m` or full one-colour
+shadow runs.
 
 The first D-only OPB has been generated with the triple-matching symmetry break
 and redundant D lower-count constraints:

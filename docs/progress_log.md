@@ -949,3 +949,36 @@ Branch B log: artifacts/solver_logs/e1_g4_branch_b_roundingsat_lp0_1h.log
 initial status: both roundingsat processes running
 initial memory: about 843MiB used in WSL, 0B swap
 ```
+
+Final result of Experiment 2, the G4-strengthened branch OPB run:
+
+```text
+Branch A result classification: TIMELIMIT / timeout
+Branch A conflicts: 4,760,000
+Branch A total solve time: 3540.16 s
+Branch A propagation time: 2765.13 s
+Branch A conflict-analysis time: 736.124 s
+Branch A peak RSS: 397,556 KB
+Branch A wall time: 1:00:22
+Branch A exit status: 4
+
+Branch B result classification: TIMELIMIT / timeout
+Branch B conflicts: 4,658,000
+Branch B total solve time: 3574.53 s
+Branch B propagation time: 2766.64 s
+Branch B conflict-analysis time: 734.809 s
+Branch B peak RSS: 411,556 KB
+Branch B wall time: 1:00:22
+Branch B exit status: 4
+```
+
+Interpretation:
+
+- No SAT witness and no UNSAT certificate.
+- G4 OPB strengthening did not decide either `E_1` branch within a 1-hour
+  RoundingSat `--lp=0` budget.
+- Memory use stayed low, so the timeout is search complexity rather than RAM
+  exhaustion.
+- This follows the Pro-model decision tree toward Experiment 3: test `E_2`
+  with the same two residual-orbit D branches before attempting larger `E_m`
+  or full one-colour shadow runs.
