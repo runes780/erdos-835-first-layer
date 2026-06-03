@@ -202,6 +202,19 @@ branch runs.  The next useful experiments are smaller ablations:
 - then, only if one of those improves search behavior, consider the
   corresponding E2-strengthened branch.
 
+The implemented ablation commands are:
+
+```bash
+MODE=all bash scripts/export_problem835_e1_ablation_branch_cnfs.sh
+MODE=d3 BRANCH=a TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e1_ablation_branch_2h.sh
+MODE=d3 BRANCH=b TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e1_ablation_branch_2h.sh
+MODE=g4 BRANCH=a TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e1_ablation_branch_2h.sh
+MODE=g4 BRANCH=b TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e1_ablation_branch_2h.sh
+```
+
+Per branch, D3-only has 1,894,053 variables and 7,426,199 clauses; G4-only has
+6,538,413 variables and 17,253,569 clauses.
+
 ## What to log
 
 For every solver attempt, save:

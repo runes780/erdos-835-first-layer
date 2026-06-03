@@ -236,6 +236,27 @@ larger E2 D3/G4 CNF is not the best immediate use of the machine.  The next
 step should be a strategy review or ablation run separating D3-only and G4-only
 constraints before escalating model size.
 
+The E1 ablation branch CNFs have been generated and launched:
+
+```text
+D3-only per branch: 1,894,053 variables, 7,426,199 clauses
+G4-only per branch: 6,538,413 variables, 17,253,569 clauses
+
+D3 Branch A sha256: ad3fb65a7d240f69367c2a4cc7705abf82d9f8c5bbf3834d041b32f6bd617e63
+D3 Branch B sha256: 085a3b2658484c927589fbc76b48e56d5c58599a0fdc6d1019d7f6d4600262ed
+G4 Branch A sha256: ec44bf4a2467bacded1f2310344ab957f1313ee7939951480b3061257a1713d6
+G4 Branch B sha256: 8711c84525dd8075a4e224469eb7ab2d4465ae9acf023290342322125e2e3cbf
+```
+
+The active ablation logs are:
+
+```text
+artifacts/solver_logs/e1_d3_kissat_branch_a_2h.log
+artifacts/solver_logs/e1_d3_kissat_branch_b_2h.log
+artifacts/solver_logs/e1_g4_kissat_branch_a_2h.log
+artifacts/solver_logs/e1_g4_kissat_branch_b_2h.log
+```
+
 The first D-only OPB has been generated with the triple-matching symmetry break
 and redundant D lower-count constraints:
 

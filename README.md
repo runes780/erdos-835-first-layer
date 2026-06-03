@@ -188,6 +188,18 @@ BRANCH=b TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e1_d3_g4_branch_2h.sh
 ```
 
 Each E1 D3/G4 branch has 8,357,853 variables and 21,071,999 clauses.
+If that combined strengthening times out, run the smaller ablations separately:
+
+```bash
+MODE=all bash scripts/export_problem835_e1_ablation_branch_cnfs.sh
+MODE=d3 BRANCH=a TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e1_ablation_branch_2h.sh
+MODE=d3 BRANCH=b TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e1_ablation_branch_2h.sh
+MODE=g4 BRANCH=a TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e1_ablation_branch_2h.sh
+MODE=g4 BRANCH=b TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e1_ablation_branch_2h.sh
+```
+
+D3-only has 1,894,053 variables and 7,426,199 clauses per branch.  G4-only
+has 6,538,413 variables and 17,253,569 clauses per branch.
 
 For the 32GB i5-13400 Windows PC, see `docs/pc_execution.md` and
 `docs/solver_runbook.md`.  The recommended path is WSL2 Ubuntu, one-colour OPB
@@ -221,6 +233,8 @@ If this repo is opened by Codex on the Windows PC, start from `TASKS.md`.
   with the same two D branch units.
 - `scripts/export_problem835_e1_d3_g4_branch_cnfs.sh`: E1 residual-orbit branch
   CNFs strengthened with D3 <= 9 and G4 <= 8 sequential-counter constraints.
+- `scripts/export_problem835_e1_ablation_branch_cnfs.sh`: E1 residual-orbit
+  branch CNFs for D3-only and G4-only ablation runs.
 - `scripts/run_roundingsat_lp0_augmented_6h.sh`: bounded RoundingSat run using
   `--lp=0`.
 - `scripts/run_roundingsat_d_only_2h.sh`: bounded RoundingSat run for the
@@ -235,6 +249,8 @@ If this repo is opened by Codex on the Windows PC, start from `TASKS.md`.
   CNF.
 - `scripts/run_kissat_e1_d3_g4_branch_2h.sh`: bounded Kissat run for an E1
   D3/G4-strengthened branch CNF.
+- `scripts/run_kissat_e1_ablation_branch_2h.sh`: bounded Kissat run for a
+  D3-only or G4-only E1 branch CNF.
 - `scripts/run_roundingsat_e1_g4_branch_1h.sh`: bounded RoundingSat run for a
   G4-strengthened E1 branch OPB.
 - `scripts/run_roundingsat_portfolio.sh`: launch a bounded portfolio of

@@ -1125,3 +1125,43 @@ Interpretation:
 - Do not automatically jump to the larger E2 D3/G4 CNF.  First run a strategy
   review or smaller ablation experiments separating D3-only and G4-only so the
   next run is informed by propagation behavior rather than raw model size.
+
+Generated and launched E1 D3-only and G4-only ablation branch CNFs:
+
+```text
+command: MODE=all bash scripts/export_problem835_e1_ablation_branch_cnfs.sh
+
+D3-only per branch:
+  variables: 1,894,053
+  clauses: 7,426,199
+  file size: about 131M
+
+G4-only per branch:
+  variables: 6,538,413
+  clauses: 17,253,569
+  file size: about 336M
+
+D3 Branch A sha256: ad3fb65a7d240f69367c2a4cc7705abf82d9f8c5bbf3834d041b32f6bd617e63
+D3 Branch B sha256: 085a3b2658484c927589fbc76b48e56d5c58599a0fdc6d1019d7f6d4600262ed
+G4 Branch A sha256: ec44bf4a2467bacded1f2310344ab957f1313ee7939951480b3061257a1713d6
+G4 Branch B sha256: 8711c84525dd8075a4e224469eb7ab2d4465ae9acf023290342322125e2e3cbf
+```
+
+Launched four Kissat ablation runs:
+
+```text
+D3 Branch A command: MODE=d3 BRANCH=a TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e1_ablation_branch_2h.sh
+D3 Branch A log: artifacts/solver_logs/e1_d3_kissat_branch_a_2h.log
+D3 Branch B command: MODE=d3 BRANCH=b TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e1_ablation_branch_2h.sh
+D3 Branch B log: artifacts/solver_logs/e1_d3_kissat_branch_b_2h.log
+G4 Branch A command: MODE=g4 BRANCH=a TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e1_ablation_branch_2h.sh
+G4 Branch A log: artifacts/solver_logs/e1_g4_kissat_branch_a_2h.log
+G4 Branch B command: MODE=g4 BRANCH=b TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e1_ablation_branch_2h.sh
+G4 Branch B log: artifacts/solver_logs/e1_g4_kissat_branch_b_2h.log
+
+initial status: all four kissat processes running
+initial memory: about 4.5GiB used in WSL, 0B swap
+initial RSS:
+  D3 A/B: about 674MB / 618MB
+  G4 A/B: about 1.39GB / 1.36GB
+```
