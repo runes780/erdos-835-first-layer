@@ -215,6 +215,20 @@ MODE=g4 BRANCH=b TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e1_ablation_bra
 Per branch, D3-only has 1,894,053 variables and 7,426,199 clauses; G4-only has
 6,538,413 variables and 17,253,569 clauses.
 
+Observed on the 32GB i5-13400 PC, all four ablation branches timed out after
+two hours:
+
+```text
+D3-only A/B: about 14.6M / 15.0M conflicts, peak RSS about 0.7GB
+G4-only A/B: about 6.7M / 7.0M conflicts, peak RSS about 2.0GB
+```
+
+Together with the combined D3/G4 timeout, this means G4 is not obviously worth
+escalating to E2.  If continuing locally without a new outside review, the
+least wasteful next strengthened probe is E2 D3-only, not E2 G4 or full E2
+D3/G4.  Otherwise, use `prompts/pro_after_ablation.md` for a Pro-model strategy
+review before spending more solver time.
+
 ## What to log
 
 For every solver attempt, save:

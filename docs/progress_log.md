@@ -1165,3 +1165,54 @@ initial RSS:
   D3 A/B: about 674MB / 618MB
   G4 A/B: about 1.39GB / 1.36GB
 ```
+
+Final result of the E1 D3-only and G4-only ablation branch split:
+
+```text
+D3 Branch A result classification: UNKNOWN / timeout
+D3 Branch A conflicts: 14,632,438
+D3 Branch A decisions: 226,973,196
+D3 Branch A propagations: 34,916,178,228
+D3 Branch A peak RSS: 705,784 KB
+D3 Branch A wall time: 2:00:00
+D3 Branch A exit status: 124
+
+D3 Branch B result classification: UNKNOWN / timeout
+D3 Branch B conflicts: 15,048,223
+D3 Branch B decisions: 240,088,533
+D3 Branch B propagations: 34,810,059,155
+D3 Branch B peak RSS: 695,268 KB
+D3 Branch B wall time: 2:00:00
+D3 Branch B exit status: 124
+
+G4 Branch A result classification: UNKNOWN / timeout
+G4 Branch A conflicts: 6,745,483
+G4 Branch A decisions: 142,181,388
+G4 Branch A propagations: 25,364,158,886
+G4 Branch A peak RSS: 2,041,276 KB
+G4 Branch A wall time: 2:00:00
+G4 Branch A exit status: 124
+
+G4 Branch B result classification: UNKNOWN / timeout
+G4 Branch B conflicts: 6,984,877
+G4 Branch B decisions: 144,429,852
+G4 Branch B propagations: 25,165,348,806
+G4 Branch B peak RSS: 2,030,716 KB
+G4 Branch B wall time: 2:00:00
+G4 Branch B exit status: 124
+```
+
+Interpretation:
+
+- No SAT witness and no UNSAT certificate.
+- Mathematical status is unchanged.
+- D3-only is the lightest strengthened CNF: about 0.7GB RSS and about
+  14.6M-15.0M conflicts in two hours.
+- G4-only uses about 2.0GB RSS and reaches about 6.7M-7.0M conflicts in two
+  hours.
+- Combined D3/G4 uses about 2.5GB RSS and reaches about 8.7M-9.2M conflicts in
+  two hours.
+- These data do not justify blindly scaling to the full E2 D3/G4 CNF.  The
+  most defensible next options are either an E2 D3-only branch probe, because
+  D3-only is the cheapest strengthened variant, or a Pro-model strategy review
+  before spending more solver time.

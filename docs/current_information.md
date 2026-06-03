@@ -402,11 +402,22 @@ short benchmark: --lp=0 gives far more conflicts/decisions per minute
 ```
 
 Those observations led to the strengthened OPB and `--lp=0` portfolio runs.
-The strengthened portfolio also timed out, so the next solver experiments
-should move to smaller D-only and fixed-D conditional targets before returning
-to the full one-colour shadow.
-The revised plan is more specific: move first through the `E_m` ladder, using
-D-only and fixed-D runs for diagnostics and symmetry-breaking evidence.
+The subsequent `E_m` ladder experiments also timed out:
+
+```text
+E1 branch CNF A/B: timeout, about 48M conflicts per branch, RSS below 270MB
+E1 G4 OPB A/B: timeout, about 4.6M-4.8M conflicts per branch, RSS about 400MB
+E2 branch CNF A/B: timeout, about 49M conflicts per branch, RSS below 470MB
+E1 D3+G4 CNF A/B: timeout, about 8.7M-9.2M conflicts, RSS about 2.5GB
+E1 D3-only CNF A/B: timeout, about 14.6M-15.0M conflicts, RSS about 0.7GB
+E1 G4-only CNF A/B: timeout, about 6.7M-7.0M conflicts, RSS about 2.0GB
+```
+
+The current best reading is that D3-only is the cheapest strengthened CNF
+variant, while G4 and combined D3/G4 increase propagation cost and memory
+substantially.  Do not repeat unchanged E1/E2 runs.  The next decision is
+whether to run a moderate E2 D3-only probe or ask the Pro model for a strategy
+review using the accumulated experiment table.
 
 ## Current repository status
 
@@ -422,6 +433,7 @@ Implemented:
 - toy instance tests;
 - LaTeX working note;
 - Pro-model next-round prompt;
+- post-ablation Pro-model strategy prompt;
 - WSL/PC execution notes.
 
 Verified locally:
