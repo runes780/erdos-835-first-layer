@@ -179,6 +179,20 @@ selected redundant cardinality constraints.  Start with branch-local
 totalizer encoding, then test whether the resulting CNF size and Kissat
 preprocessing remain manageable.
 
+The implemented sequential-counter route is:
+
+```bash
+bash scripts/export_problem835_e1_d3_g4_branch_cnfs.sh
+BRANCH=a TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e1_d3_g4_branch_2h.sh
+BRANCH=b TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e1_d3_g4_branch_2h.sh
+```
+
+This starts with E1 rather than E2 because E1 is still decisive and the
+strengthened E1 CNF is smaller: 8,357,853 variables and 21,071,999 clauses per
+branch.  The estimated E2 D3/G4 CNF is larger, at 14,875,917 variables and
+37,559,876 clauses per branch, so run E1 first as the size and propagation
+probe.
+
 ## What to log
 
 For every solver attempt, save:

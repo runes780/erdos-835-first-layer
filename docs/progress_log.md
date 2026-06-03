@@ -1046,3 +1046,50 @@ Interpretation:
   unstrengthened runs.  The next engineering target is a CNF-strengthened
   branch-local model with selected redundant cardinality constraints, starting
   from D3 <= 9 and G4 <= 8 if the encoder size remains manageable.
+
+Implemented CNF sequential-counter upper-bound support for the staged ladder:
+
+```text
+new flags:
+  --add-d3-upper-counts
+  --add-g4-upper-counts
+
+E1 branch with D3/G4:
+  variables: 8,357,853
+  auxiliary variables: 8,283,240
+  clauses: 21,071,999
+  D3 constraints: 1,330
+  D3 clauses: 3,818,430
+  G4 constraints: 5,985
+  G4 clauses: 13,645,800
+
+E2 branch with D3/G4:
+  variables: 14,875,917
+  auxiliary variables: 14,747,040
+  clauses: 37,559,876
+```
+
+Started the E1 D3/G4 strengthened branch split as the smaller decisive size
+probe:
+
+```text
+command: bash scripts/export_problem835_e1_d3_g4_branch_cnfs.sh
+Branch A CNF: artifacts/problem835_e1_d3_g4_branch_a.cnf
+Branch A sha256: 2206e3b78ce1e885c2c5592f34d07d9017d223cbac610673ab8c3ae1de02f9b0
+Branch B CNF: artifacts/problem835_e1_d3_g4_branch_b.cnf
+Branch B sha256: f9f3807a7ab9078050b1ab61abbb8536f5c6760277b39fa3a8ed5c30348254fc
+per-branch header: p cnf 8357853 21071999
+per-branch file size: about 414M
+```
+
+Launched both Kissat E1 D3/G4 branch runs:
+
+```text
+Branch A command: BRANCH=a TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e1_d3_g4_branch_2h.sh
+Branch A log: artifacts/solver_logs/e1_d3_g4_kissat_branch_a_2h.log
+Branch B command: BRANCH=b TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e1_d3_g4_branch_2h.sh
+Branch B log: artifacts/solver_logs/e1_d3_g4_kissat_branch_b_2h.log
+initial status: both kissat processes running
+initial memory: about 3.9GiB used in WSL, 0B swap
+initial RSS: about 1.7GB per Kissat process
+```

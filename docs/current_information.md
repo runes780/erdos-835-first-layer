@@ -204,6 +204,25 @@ runs.  The Pro-model recommendation is to start with D3 <= 9 and G4 <= 8,
 using a bounded sequential-counter or totalizer encoding if the generated CNF
 size remains manageable.
 
+The sequential-counter CNF strengthening has been implemented for the staged
+ladder generator.  For each branch:
+
+```text
+E1 + D3/G4 CNF:  8,357,853 variables, 21,071,999 clauses
+E2 + D3/G4 CNF: 14,875,917 variables, 37,559,876 clauses
+```
+
+The active run is the smaller decisive E1 D3/G4 branch split:
+
+```text
+Branch A D:0,1,3,6,8 sha256: 2206e3b78ce1e885c2c5592f34d07d9017d223cbac610673ab8c3ae1de02f9b0
+Branch B D:0,1,3,6,9 sha256: f9f3807a7ab9078050b1ab61abbb8536f5c6760277b39fa3a8ed5c30348254fc
+```
+
+The active logs are
+`artifacts/solver_logs/e1_d3_g4_kissat_branch_a_2h.log` and
+`artifacts/solver_logs/e1_d3_g4_kissat_branch_b_2h.log`.
+
 The first D-only OPB has been generated with the triple-matching symmetry break
 and redundant D lower-count constraints:
 
