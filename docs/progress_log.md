@@ -982,3 +982,35 @@ Interpretation:
 - This follows the Pro-model decision tree toward Experiment 3: test `E_2`
   with the same two residual-orbit D branches before attempting larger `E_m`
   or full one-colour shadow runs.
+
+Set up a Codex heartbeat automation for this thread:
+
+```text
+automation id: check-835-e2-progress
+interval: every 30 minutes
+purpose: inspect solver processes, classify completed logs, update docs, push
+         results, and continue the documented Pro-model solver queue when no
+         solver is active.
+```
+
+Started Experiment 3, the residual-orbit `E_2` CNF split:
+
+```text
+command: bash scripts/export_problem835_e2_branch_cnfs.sh
+Branch A CNF: artifacts/problem835_e2_branch_a.cnf
+Branch A sha256: 13746f89cbaa424bd88654d45d66bb978821e263eaad6d10cb8a08d61596a10e
+Branch B CNF: artifacts/problem835_e2_branch_b.cnf
+Branch B sha256: 56080d1ad72bb002bd462bb062494233a7b90a990e1d0a1a864795b95277ad58
+per-branch stats: 128,877 variables, 6,449,846 clauses
+```
+
+Launched both Kissat E2 branch runs:
+
+```text
+Branch A command: BRANCH=a TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e2_branch_2h.sh
+Branch A log: artifacts/solver_logs/e2_kissat_branch_a_2h.log
+Branch B command: BRANCH=b TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e2_branch_2h.sh
+Branch B log: artifacts/solver_logs/e2_kissat_branch_b_2h.log
+initial status: both kissat processes running
+initial memory: about 1.3GiB used in WSL, 0B swap
+```

@@ -176,10 +176,19 @@ Branch B D:0,1,3,6,9: TIMELIMIT, 4,658,000 conflicts, peak RSS 411,556 KB
 ```
 
 No SAT witness or UNSAT certificate was produced.  Memory use stayed low, so
-this is a search-complexity result rather than a hardware/RAM failure.  The
-next Pro-model branch is Experiment 3: test `E_2` pairwise CNFs under the same
-two residual-orbit D branches before trying larger `E_m` or full one-colour
-shadow runs.
+this is a search-complexity result rather than a hardware/RAM failure.
+
+Experiment 3 has now been launched: `E_2` pairwise CNFs under the same two
+residual-orbit D branches.  Each branch has 128,877 variables and 6,449,846
+clauses:
+
+```text
+Branch A D:0,1,3,6,8 sha256: 13746f89cbaa424bd88654d45d66bb978821e263eaad6d10cb8a08d61596a10e
+Branch B D:0,1,3,6,9 sha256: 56080d1ad72bb002bd462bb062494233a7b90a990e1d0a1a864795b95277ad58
+```
+
+The active logs are `artifacts/solver_logs/e2_kissat_branch_a_2h.log` and
+`artifacts/solver_logs/e2_kissat_branch_b_2h.log`.
 
 The first D-only OPB has been generated with the triple-matching symmetry break
 and redundant D lower-count constraints:

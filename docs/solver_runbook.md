@@ -160,6 +160,18 @@ BRANCH=a TIME_LIMIT_SECONDS=3600 bash scripts/run_roundingsat_e1_g4_branch_1h.sh
 BRANCH=b TIME_LIMIT_SECONDS=3600 bash scripts/run_roundingsat_e1_g4_branch_1h.sh
 ```
 
+If both E1 branch experiments time out, move to the E2 pairwise CNF branches:
+
+```bash
+bash scripts/export_problem835_e2_branch_cnfs.sh
+BRANCH=a TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e2_branch_2h.sh
+BRANCH=b TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e2_branch_2h.sh
+```
+
+Each E2 branch CNF has 128,877 variables, 6,449,846 clauses, and the same two
+D branch units.  Both branches must be interpreted together; a single SAT,
+UNSAT, or timeout result is not a global conclusion.
+
 ## What to log
 
 For every solver attempt, save:

@@ -169,6 +169,15 @@ BRANCH=a TIME_LIMIT_SECONDS=3600 bash scripts/run_roundingsat_e1_g4_branch_1h.sh
 BRANCH=b TIME_LIMIT_SECONDS=3600 bash scripts/run_roundingsat_e1_g4_branch_1h.sh
 ```
 
+After both E1 branch approaches time out, run the Pro-model E2 branch
+experiment:
+
+```bash
+bash scripts/export_problem835_e2_branch_cnfs.sh
+BRANCH=a TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e2_branch_2h.sh
+BRANCH=b TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e2_branch_2h.sh
+```
+
 For the 32GB i5-13400 Windows PC, see `docs/pc_execution.md` and
 `docs/solver_runbook.md`.  The recommended path is WSL2 Ubuntu, one-colour OPB
 first, and strict solver time/memory limits.
@@ -197,6 +206,8 @@ If this repo is opened by Codex on the Windows PC, start from `TASKS.md`.
   with `D:0,1,3,6,8` and `D:0,1,3,6,9`.
 - `scripts/export_problem835_e1_g4_branch_opbs.sh`: E1 branch OPBs with D
   lower counts and G4 equalities.
+- `scripts/export_problem835_e2_branch_cnfs.sh`: E2 residual-orbit branch CNFs
+  with the same two D branch units.
 - `scripts/run_roundingsat_lp0_augmented_6h.sh`: bounded RoundingSat run using
   `--lp=0`.
 - `scripts/run_roundingsat_d_only_2h.sh`: bounded RoundingSat run for the
@@ -206,6 +217,8 @@ If this repo is opened by Codex on the Windows PC, start from `TASKS.md`.
 - `scripts/run_cadical_portfolio.sh`: launch a bounded portfolio of
   independent CaDiCaL CNF variants.
 - `scripts/run_kissat_e1_branch_2h.sh`: bounded Kissat run for an E1 branch
+  CNF.
+- `scripts/run_kissat_e2_branch_2h.sh`: bounded Kissat run for an E2 branch
   CNF.
 - `scripts/run_roundingsat_e1_g4_branch_1h.sh`: bounded RoundingSat run for a
   G4-strengthened E1 branch OPB.
