@@ -190,6 +190,20 @@ Branch B D:0,1,3,6,9 sha256: 56080d1ad72bb002bd462bb062494233a7b90a990e1d0a1a864
 The active logs are `artifacts/solver_logs/e2_kissat_branch_a_2h.log` and
 `artifacts/solver_logs/e2_kissat_branch_b_2h.log`.
 
+Both active `E_2` branch logs reached timeout:
+
+```text
+Branch A D:0,1,3,6,8: UNKNOWN / timeout, 49,546,914 conflicts, peak RSS 462,444 KB
+Branch B D:0,1,3,6,9: UNKNOWN / timeout, 49,379,546 conflicts, peak RSS 436,164 KB
+```
+
+No SAT witness or UNSAT certificate was produced.  The next useful engineering
+target is to strengthen the branch-local CNF with selected redundant
+cardinality constraints, not to repeat the same unstrengthened `E_1` or `E_2`
+runs.  The Pro-model recommendation is to start with D3 <= 9 and G4 <= 8,
+using a bounded sequential-counter or totalizer encoding if the generated CNF
+size remains manageable.
+
 The first D-only OPB has been generated with the triple-matching symmetry break
 and redundant D lower-count constraints:
 

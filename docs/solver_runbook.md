@@ -172,6 +172,13 @@ Each E2 branch CNF has 128,877 variables, 6,449,846 clauses, and the same two
 D branch units.  Both branches must be interpreted together; a single SAT,
 UNSAT, or timeout result is not a global conclusion.
 
+If both E2 branches time out, do not repeat the same unstrengthened branch
+CNFs.  The next Pro-model engineering target is a strengthened CNF with
+selected redundant cardinality constraints.  Start with branch-local
+`D3 <= 9` and `G4 <= 8` constraints using a bounded sequential-counter or
+totalizer encoding, then test whether the resulting CNF size and Kissat
+preprocessing remain manageable.
+
 ## What to log
 
 For every solver attempt, save:

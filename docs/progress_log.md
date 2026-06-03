@@ -1014,3 +1014,35 @@ Branch B log: artifacts/solver_logs/e2_kissat_branch_b_2h.log
 initial status: both kissat processes running
 initial memory: about 1.3GiB used in WSL, 0B swap
 ```
+
+Final result of Experiment 3, the residual-orbit `E_2` CNF split:
+
+```text
+Branch A result classification: UNKNOWN / timeout
+Branch A conflicts: 49,546,914
+Branch A decisions: 861,193,401
+Branch A propagations: 52,637,830,321
+Branch A peak RSS: 462,444 KB
+Branch A wall time: 2:00:00
+Branch A exit status: 124
+
+Branch B result classification: UNKNOWN / timeout
+Branch B conflicts: 49,379,546
+Branch B decisions: 875,123,339
+Branch B propagations: 52,847,136,458
+Branch B peak RSS: 436,164 KB
+Branch B wall time: 2:00:00
+Branch B exit status: 124
+```
+
+Interpretation:
+
+- No SAT witness and no UNSAT certificate.
+- The `E_2` branch split did not decide the instance within a 2-hour Kissat
+  run.
+- Memory use stayed low, so this remains a search-complexity result rather
+  than a hardware/RAM failure.
+- Per the Pro-model strategy, the next useful branch is not to repeat old
+  unstrengthened runs.  The next engineering target is a CNF-strengthened
+  branch-local model with selected redundant cardinality constraints, starting
+  from D3 <= 9 and G4 <= 8 if the encoder size remains manageable.
