@@ -193,6 +193,15 @@ branch.  The estimated E2 D3/G4 CNF is larger, at 14,875,917 variables and
 37,559,876 clauses per branch, so run E1 first as the size and propagation
 probe.
 
+If E1 D3/G4 also times out, pause before launching E2 D3/G4.  Record the
+conflict rate, propagation rate, and RSS against the unstrengthened E1/E2
+branch runs.  The next useful experiments are smaller ablations:
+
+- E1 branch CNF with D3 <= 9 only;
+- E1 branch CNF with G4 <= 8 only;
+- then, only if one of those improves search behavior, consider the
+  corresponding E2-strengthened branch.
+
 ## What to log
 
 For every solver attempt, save:

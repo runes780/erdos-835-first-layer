@@ -1093,3 +1093,35 @@ initial status: both kissat processes running
 initial memory: about 3.9GiB used in WSL, 0B swap
 initial RSS: about 1.7GB per Kissat process
 ```
+
+Final result of the E1 D3/G4 strengthened branch split:
+
+```text
+Branch A result classification: UNKNOWN / timeout
+Branch A conflicts: 8,661,819
+Branch A decisions: 188,431,927
+Branch A propagations: 35,270,234,849
+Branch A peak RSS: 2,523,444 KB
+Branch A wall time: 2:00:00
+Branch A exit status: 124
+
+Branch B result classification: UNKNOWN / timeout
+Branch B conflicts: 9,229,109
+Branch B decisions: 204,214,127
+Branch B propagations: 34,332,244,642
+Branch B peak RSS: 2,579,572 KB
+Branch B wall time: 2:00:00
+Branch B exit status: 124
+```
+
+Interpretation:
+
+- No SAT witness and no UNSAT certificate.
+- The strengthened E1 CNF remained memory-safe but did not decide either
+  branch within two hours.
+- The redundancy changed solver behavior substantially: compared with the E1
+  branch pairwise CNF, Kissat explored far fewer conflicts but with much higher
+  per-conflict propagation cost and memory use.
+- Do not automatically jump to the larger E2 D3/G4 CNF.  First run a strategy
+  review or smaller ablation experiments separating D3-only and G4-only so the
+  next run is informed by propagation behavior rather than raw model size.

@@ -223,6 +223,19 @@ The active logs are
 `artifacts/solver_logs/e1_d3_g4_kissat_branch_a_2h.log` and
 `artifacts/solver_logs/e1_d3_g4_kissat_branch_b_2h.log`.
 
+The E1 D3/G4 branch split also reached timeout:
+
+```text
+Branch A D:0,1,3,6,8: UNKNOWN / timeout, 8,661,819 conflicts, peak RSS 2,523,444 KB
+Branch B D:0,1,3,6,9: UNKNOWN / timeout, 9,229,109 conflicts, peak RSS 2,579,572 KB
+```
+
+No SAT witness or UNSAT certificate was produced.  The run was memory-safe, but
+the stronger CNF increased propagation cost enough that a blind move to the
+larger E2 D3/G4 CNF is not the best immediate use of the machine.  The next
+step should be a strategy review or ablation run separating D3-only and G4-only
+constraints before escalating model size.
+
 The first D-only OPB has been generated with the triple-matching symmetry break
 and redundant D lower-count constraints:
 
