@@ -229,6 +229,17 @@ least wasteful next strengthened probe is E2 D3-only, not E2 G4 or full E2
 D3/G4.  Otherwise, use `prompts/pro_after_ablation.md` for a Pro-model strategy
 review before spending more solver time.
 
+The implemented E2 D3-only probe is:
+
+```bash
+bash scripts/export_problem835_e2_d3_branch_cnfs.sh
+BRANCH=a TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e2_d3_branch_2h.sh
+BRANCH=b TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e2_d3_branch_2h.sh
+```
+
+This is still an exploratory strengthened-branch run.  Both branches must be
+classified together, and a timeout changes no mathematical status.
+
 ## What to log
 
 For every solver attempt, save:

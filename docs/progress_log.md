@@ -1216,3 +1216,49 @@ Interpretation:
   most defensible next options are either an E2 D3-only branch probe, because
   D3-only is the cheapest strengthened variant, or a Pro-model strategy review
   before spending more solver time.
+
+Decision after the ablation review:
+
+- Continue locally with E2 D3-only as the smallest strengthened E2 follow-up.
+- Do not launch E2 G4-only or E2 D3/G4 before a stronger signal or Pro-model
+  review.
+- Added scripts:
+
+```text
+scripts/export_problem835_e2_d3_branch_cnfs.sh
+scripts/run_kissat_e2_d3_branch_2h.sh
+```
+
+Generated E2 D3-only branch CNFs:
+
+```text
+command: bash scripts/export_problem835_e2_d3_branch_cnfs.sh
+
+per branch:
+  variables: 1,948,317
+  base variables: 128,877
+  auxiliary variables: 1,819,440
+  clauses: 10,268,276
+  exact-one clauses: 6,395,571
+  disjointness clauses: 54,264
+  D3 constraints: 1,330
+  D3 clauses: 3,818,430
+  symmetry unit clauses: 11
+  file size: 187,606,438 bytes
+
+Branch A CNF: artifacts/problem835_e2_d3_branch_a.cnf
+Branch A sha256: c8acbc385da0e08a1bd0cc67e5ff378c7c43057664ba313721178d5a59e99289
+
+Branch B CNF: artifacts/problem835_e2_d3_branch_b.cnf
+Branch B sha256: 0c5ce67ead77f68decfeafd8fbabbe228ece7e2429f2ebdf0b6bd5787c54b597
+```
+
+Launched both Kissat E2 D3-only branch runs:
+
+```text
+Branch A command: BRANCH=a TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e2_d3_branch_2h.sh
+Branch A log: artifacts/solver_logs/e2_d3_kissat_branch_a_2h.log
+
+Branch B command: BRANCH=b TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e2_d3_branch_2h.sh
+Branch B log: artifacts/solver_logs/e2_d3_kissat_branch_b_2h.log
+```

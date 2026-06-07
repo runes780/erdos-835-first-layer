@@ -419,6 +419,19 @@ substantially.  Do not repeat unchanged E1/E2 runs.  The next decision is
 whether to run a moderate E2 D3-only probe or ask the Pro model for a strategy
 review using the accumulated experiment table.
 
+Current decision: run the moderate E2 D3-only branch probe as the next local
+experiment, while keeping `prompts/pro_after_ablation.md` ready for outside
+strategy review.  Do not escalate to E2 G4-only or E2 D3/G4 without new
+evidence.
+
+Generated E2 D3-only branch size:
+
+```text
+per branch: 1,948,317 variables, 10,268,276 clauses, about 188MB
+Branch A sha256: c8acbc385da0e08a1bd0cc67e5ff378c7c43057664ba313721178d5a59e99289
+Branch B sha256: 0c5ce67ead77f68decfeafd8fbabbe228ece7e2429f2ebdf0b6bd5787c54b597
+```
+
 ## Current repository status
 
 Implemented:
