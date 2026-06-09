@@ -432,6 +432,17 @@ Branch A sha256: c8acbc385da0e08a1bd0cc67e5ff378c7c43057664ba313721178d5a59e9928
 Branch B sha256: 0c5ce67ead77f68decfeafd8fbabbe228ece7e2429f2ebdf0b6bd5787c54b597
 ```
 
+E2 D3-only result:
+
+```text
+Branch A: UNKNOWN / timeout, 19,782,418 conflicts, 832,744 KB peak RSS
+Branch B: UNKNOWN / timeout, 19,235,813 conflicts, 857,116 KB peak RSS
+```
+
+No SAT witness or UNSAT certificate was produced.  Mathematical status is
+unchanged.  Do not start E2 G4-only or E2 D3/G4 automatically; the next useful
+step is a strategy review using the accumulated branch results.
+
 ## Current repository status
 
 Implemented:

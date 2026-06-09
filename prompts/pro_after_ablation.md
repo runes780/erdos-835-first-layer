@@ -81,6 +81,14 @@ Experiment table on the 32GB i5-13400 PC:
    Kissat 2h:
      A timeout, 6,745,483 conflicts, RSS 2,041,276 KB
      B timeout, 6,984,877 conflicts, RSS 2,030,716 KB
+
+7. E2 D3-only branch CNF
+   per branch: 1,948,317 variables, 10,268,276 clauses
+   Kissat 2h:
+     A timeout, 19,782,418 conflicts, 336,235,411 decisions,
+        51,087,948,652 propagations, RSS 832,744 KB
+     B timeout, 19,235,813 conflicts, 327,144,169 decisions,
+        50,588,260,574 propagations, RSS 857,116 KB
 ```
 
 No SAT witness and no UNSAT certificate were produced.  Mathematical status is
@@ -92,21 +100,22 @@ Current engineering interpretation:
 - D3-only is the cheapest strengthened CNF.
 - G4-only and D3+G4 use much more memory and reduce conflict throughput.
 - Baseline E2 is not harder than E1 by memory, but it also timed out.
-- Blindly escalating to E2 D3+G4 may be wasteful.
+- E2 D3-only is memory-safe, but it also timed out in both branches.
+- Blindly escalating to E2 G4-only or E2 D3+G4 may be wasteful.
 ```
 
 Please audit this next-step decision:
 
-1. Should we run E2 D3-only branch CNFs next, because D3-only was the best
-   strengthened E1 variant?
-2. Or should we stop local solver runs and derive a stronger branch split or
+1. Should we stop local solver runs and derive a stronger branch split or
    a different redundant constraint first?
-3. Is there a safe residual-orbit split after Branch A/B that is easy to
+2. Is there a safe residual-orbit split after Branch A/B that is easy to
    justify and likely stronger than adding cardinality encodings?
-4. Are there CNF redundancies better than D3 <= 9 and G4 <= 8 for Kissat, with
+3. Are there CNF redundancies better than D3 <= 9 and G4 <= 8 for Kissat, with
    manageable size on a 32GB machine?
-5. Should OPB/RoundingSat still be used, or have the results made CDCL CNF the
+4. Should OPB/RoundingSat still be used, or have the results made CDCL CNF the
    better route for now?
+5. Is E_m still the right ladder, or should we switch to a different
+   fixed-colour/global core before spending more CPU?
 
 Output a concrete next plan with no more than three experiments.  For each
 experiment, specify expected size, solver, time limit, and what outcome would

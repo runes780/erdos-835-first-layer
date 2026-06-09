@@ -1262,3 +1262,36 @@ Branch A log: artifacts/solver_logs/e2_d3_kissat_branch_a_2h.log
 Branch B command: BRANCH=b TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e2_d3_branch_2h.sh
 Branch B log: artifacts/solver_logs/e2_d3_kissat_branch_b_2h.log
 ```
+
+Final result of the E2 D3-only branch probe:
+
+```text
+Branch A result classification: UNKNOWN / timeout
+Branch A conflicts: 19,782,418
+Branch A decisions: 336,235,411
+Branch A propagations: 51,087,948,652
+Branch A peak RSS: 832,744 KB
+Branch A wall time: 2:00:00
+Branch A exit status: 124
+
+Branch B result classification: UNKNOWN / timeout
+Branch B conflicts: 19,235,813
+Branch B decisions: 327,144,169
+Branch B propagations: 50,588,260,574
+Branch B peak RSS: 857,116 KB
+Branch B wall time: 2:00:00
+Branch B exit status: 124
+```
+
+Interpretation:
+
+- No SAT witness and no UNSAT certificate.
+- Mathematical status is unchanged.
+- E2 D3-only is memory-safe on the 32GB PC, staying below 1GB RSS per branch.
+- It did not decide either residual branch within two hours.
+- Compared with E2 baseline, the D3-only strengthening reduced conflict count
+  over two hours but increased per-conflict work; compared with E1 D3-only it
+  used slightly more memory and reached a similar order of conflicts.
+- Do not launch E2 G4-only or E2 D3/G4 automatically.  The next step should be
+  a strategy review using `prompts/pro_after_ablation.md` and the E2 D3-only
+  results.

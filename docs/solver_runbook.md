@@ -240,6 +240,12 @@ BRANCH=b TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e2_d3_branch_2h.sh
 This is still an exploratory strengthened-branch run.  Both branches must be
 classified together, and a timeout changes no mathematical status.
 
+Observed result: both E2 D3-only branches timed out after two hours.  Branch A
+reached 19,782,418 conflicts with 832,744 KB peak RSS; Branch B reached
+19,235,813 conflicts with 857,116 KB peak RSS.  This was memory-safe but not
+decisive.  Do not escalate automatically to E2 G4-only or E2 D3/G4; use the
+Pro-model strategy prompt before selecting another large run.
+
 ## What to log
 
 For every solver attempt, save:
