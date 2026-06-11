@@ -246,6 +246,30 @@ reached 19,782,418 conflicts with 832,744 KB peak RSS; Branch B reached
 decisive.  Do not escalate automatically to E2 G4-only or E2 D3/G4; use the
 Pro-model strategy prompt before selecting another large run.
 
+The next Pro-reviewed branch refinement replaces the A/B branch split by three
+terminal branches:
+
+```text
+A*: D:{0,1,3,6,8}, D:{0,1,3,9,11}
+B1: D:{0,1,3,6,9}, D:{0,1,3,8,10}
+B2: D:{0,1,3,6,9}, D:{0,1,3,8,11}
+```
+
+The branch coverage audit lives in `src/problem835_terminal_branches.py` and
+`tests/test_problem835_terminal_branches.py`.
+
+Generate and run the E1 D3-only terminal branch CNFs with:
+
+```bash
+bash scripts/export_problem835_e1_d3_terminal_branch_cnfs.sh
+BRANCH=a_star TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e1_d3_terminal_branch_2h.sh
+BRANCH=b1 TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e1_d3_terminal_branch_2h.sh
+BRANCH=b2 TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e1_d3_terminal_branch_2h.sh
+```
+
+Per terminal branch, the generated CNF has 1,894,053 variables and 7,426,200
+clauses.  Do not add G4 in this round.
+
 ## What to log
 
 For every solver attempt, save:

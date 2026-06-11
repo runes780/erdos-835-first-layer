@@ -53,6 +53,17 @@ class ExtensionLadderCnfStatsTests(unittest.TestCase):
         self.assertEqual(stats.symmetry_unit_clauses, 11)
         self.assertEqual(stats.total_clauses, 3607769)
 
+    def test_problem_e1_terminal_branch_cnf_adds_two_unit_clauses(self):
+        stats = compute_extension_ladder_cnf_stats(
+            OneColorConfig(v=21, t=4, extension_count=1),
+            symmetry_break="triple-matching-off-triple",
+            forced_d_blocks=[(0, 1, 3, 6, 8), (0, 1, 3, 9, 11)],
+        )
+
+        self.assertEqual(stats.variables, 74613)
+        self.assertEqual(stats.symmetry_unit_clauses, 12)
+        self.assertEqual(stats.total_clauses, 3607770)
+
     def test_problem_e1_branch_d3_g4_cnf_counts(self):
         stats = compute_extension_ladder_cnf_stats(
             OneColorConfig(v=21, t=4, extension_count=1),

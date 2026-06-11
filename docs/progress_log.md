@@ -1295,3 +1295,101 @@ Interpretation:
 - Do not launch E2 G4-only or E2 D3/G4 automatically.  The next step should be
   a strategy review using `prompts/pro_after_ablation.md` and the E2 D3-only
   results.
+
+Pro-model strategy review after the E2 D3-only timeouts recommended refining
+the residual-orbit branching before adding heavier G4-style constraints.
+
+Implemented the three terminal residual branches:
+
+```text
+A*:
+  force D:{0,1,3,6,8}
+  force D:{0,1,3,9,11}
+
+B1:
+  force D:{0,1,3,6,9}
+  force D:{0,1,3,8,10}
+
+B2:
+  force D:{0,1,3,6,9}
+  force D:{0,1,3,8,11}
+```
+
+Added a small orbit-audit module and tests:
+
+```text
+src/problem835_terminal_branches.py
+tests/test_problem835_terminal_branches.py
+```
+
+The audit checks:
+
+```text
+initial Q={0,1,3,6}: valid fifth points split as {8} and {9,...,20}
+Branch A, Q_A={0,1,3,9}: valid fifth points {11,...,20} form one orbit
+Branch B, Q_B={0,1,3,8}: valid fifth points split as {10} and {11,...,20}
+```
+
+Added scripts:
+
+```text
+scripts/export_problem835_e1_d3_terminal_branch_cnfs.sh
+scripts/run_kissat_e1_d3_terminal_branch_2h.sh
+```
+
+Generated E1 D3-only terminal branch CNFs:
+
+```text
+command: bash scripts/export_problem835_e1_d3_terminal_branch_cnfs.sh
+
+per branch:
+  variables: 1,894,053
+  base variables: 74,613
+  auxiliary variables: 1,819,440
+  clauses: 7,426,200
+  exact-one clauses: 3,607,758
+  D3 constraints: 1,330
+  D3 clauses: 3,818,430
+  symmetry unit clauses: 12
+  file size: 137,240,256 bytes
+
+A* CNF: artifacts/problem835_e1_d3_terminal_a_star.cnf
+A* sha256: efb652484721dc7bc384d30923127983cd829ae4b32ab63d0969194a37645109
+
+B1 CNF: artifacts/problem835_e1_d3_terminal_b1.cnf
+B1 sha256: 42e8e5e69292d4a93f7b3146d6f11adad6ca27c3e1d75eeb25f54130f68262ea
+
+B2 CNF: artifacts/problem835_e1_d3_terminal_b2.cnf
+B2 sha256: 5878781540b1ba625d78a9535f28497989daf997684f193c52b9a85c65ce11ce
+```
+
+Verification before launch:
+
+```text
+python -m unittest discover -s tests -v
+result: 64 tests OK
+
+bash -n scripts/export_problem835_e1_d3_terminal_branch_cnfs.sh
+bash -n scripts/run_kissat_e1_d3_terminal_branch_2h.sh
+result: OK
+```
+
+Launched the three E1 D3-only terminal branch Kissat runs:
+
+```text
+A* command: BRANCH=a_star TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e1_d3_terminal_branch_2h.sh
+A* log: artifacts/solver_logs/e1_d3_terminal_a_star_kissat_2h.log
+
+B1 command: BRANCH=b1 TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e1_d3_terminal_branch_2h.sh
+B1 log: artifacts/solver_logs/e1_d3_terminal_b1_kissat_2h.log
+
+B2 command: BRANCH=b2 TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e1_d3_terminal_branch_2h.sh
+B2 log: artifacts/solver_logs/e1_d3_terminal_b2_kissat_2h.log
+
+initial status: all three kissat processes running
+initial memory: about 2.7GiB used in WSL, 0B swap
+initial RSS:
+  A*: about 557MB
+  B1: about 558MB
+  B2: about 548MB
+```

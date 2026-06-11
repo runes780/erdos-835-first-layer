@@ -443,6 +443,36 @@ No SAT witness or UNSAT certificate was produced.  Mathematical status is
 unchanged.  Do not start E2 G4-only or E2 D3/G4 automatically; the next useful
 step is a strategy review using the accumulated branch results.
 
+The Pro-model strategy review recommended refining the residual-orbit branch
+split before adding heavier G4 constraints.  The next branch family is:
+
+```text
+A*: D:{0,1,3,6,8}, D:{0,1,3,9,11}
+B1: D:{0,1,3,6,9}, D:{0,1,3,8,10}
+B2: D:{0,1,3,6,9}, D:{0,1,3,8,11}
+```
+
+An orbit-audit module now documents the branch coverage checks.  The generated
+E1 D3-only terminal CNFs have:
+
+```text
+per branch: 1,894,053 variables, 7,426,200 clauses, about 137MB
+A* sha256: efb652484721dc7bc384d30923127983cd829ae4b32ab63d0969194a37645109
+B1 sha256: 42e8e5e69292d4a93f7b3146d6f11adad6ca27c3e1d75eeb25f54130f68262ea
+B2 sha256: 5878781540b1ba625d78a9535f28497989daf997684f193c52b9a85c65ce11ce
+```
+
+Current active experiment:
+
+```text
+E1 D3-only terminal branches A*, B1, B2
+time limit: 2h per branch
+logs:
+  artifacts/solver_logs/e1_d3_terminal_a_star_kissat_2h.log
+  artifacts/solver_logs/e1_d3_terminal_b1_kissat_2h.log
+  artifacts/solver_logs/e1_d3_terminal_b2_kissat_2h.log
+```
+
 ## Current repository status
 
 Implemented:
@@ -458,6 +488,7 @@ Implemented:
 - LaTeX working note;
 - Pro-model next-round prompt;
 - post-ablation Pro-model strategy prompt;
+- terminal residual-branch orbit audit;
 - WSL/PC execution notes.
 
 Verified locally:
