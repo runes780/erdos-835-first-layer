@@ -89,6 +89,16 @@ Experiment table on the 32GB i5-13400 PC:
         51,087,948,652 propagations, RSS 832,744 KB
      B timeout, 19,235,813 conflicts, 327,144,169 decisions,
         50,588,260,574 propagations, RSS 857,116 KB
+
+8. E1 D3-only terminal residual branch CNF
+   per branch: 1,894,053 variables, 7,426,200 clauses
+   Kissat 2h:
+     A* timeout, 15,836,581 conflicts, 245,241,234 decisions,
+        36,245,305,287 propagations, RSS 690,088 KB
+     B1 timeout, 15,572,920 conflicts, 248,944,938 decisions,
+        35,759,241,395 propagations, RSS 703,468 KB
+     B2 timeout, 15,528,800 conflicts, 245,659,982 decisions,
+        36,446,428,207 propagations, RSS 688,336 KB
 ```
 
 No SAT witness and no UNSAT certificate were produced.  Mathematical status is
@@ -101,6 +111,7 @@ Current engineering interpretation:
 - G4-only and D3+G4 use much more memory and reduce conflict throughput.
 - Baseline E2 is not harder than E1 by memory, but it also timed out.
 - E2 D3-only is memory-safe, but it also timed out in both branches.
+- E1 D3-only terminal branches are memory-safe, but all three timed out.
 - Blindly escalating to E2 G4-only or E2 D3+G4 may be wasteful.
 ```
 

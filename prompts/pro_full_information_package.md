@@ -393,6 +393,36 @@ UNSAT certificate have been produced.
      decisions: 327,144,169
      propagations: 50,588,260,574
      peak RSS: 857,116 KB
+
+8. E1 D3-only terminal residual branch CNF
+   terminal branches:
+     A*: D:{0,1,3,6,8}, D:{0,1,3,9,11}
+     B1: D:{0,1,3,6,9}, D:{0,1,3,8,10}
+     B2: D:{0,1,3,6,9}, D:{0,1,3,8,11}
+   per branch: 1,894,053 variables, 7,426,200 clauses
+   solver: Kissat
+   time limit: 2h per branch
+
+   A*:
+     result: UNKNOWN / timeout
+     conflicts: 15,836,581
+     decisions: 245,241,234
+     propagations: 36,245,305,287
+     peak RSS: 690,088 KB
+
+   B1:
+     result: UNKNOWN / timeout
+     conflicts: 15,572,920
+     decisions: 248,944,938
+     propagations: 35,759,241,395
+     peak RSS: 703,468 KB
+
+   B2:
+     result: UNKNOWN / timeout
+     conflicts: 15,528,800
+     decisions: 245,659,982
+     propagations: 36,446,428,207
+     peak RSS: 688,336 KB
 ```
 
 ## 10. Current Engineering Interpretation
@@ -404,6 +434,8 @@ Our current read is:
 - D3-only is the cheapest useful strengthened CNF variant so far.
 - G4-only and D3+G4 consume much more memory and lower conflict throughput.
 - E2 D3-only is memory-safe but still times out.
+- The E1 D3-only terminal residual split is memory-safe, but it also timed out
+  in all three terminal branches.
 - Blindly escalating to E2 G4-only or E2 D3+G4 is probably not the best next
   use of the machine.
 - More raw runtime on unchanged instances is not a good strategy.

@@ -1393,3 +1393,41 @@ initial RSS:
   B1: about 558MB
   B2: about 548MB
 ```
+
+Final result of the E1 D3-only terminal branch probe:
+
+```text
+A* result classification: UNKNOWN / timeout
+A* conflicts: 15,836,581
+A* decisions: 245,241,234
+A* propagations: 36,245,305,287
+A* peak RSS: 690,088 KB
+A* wall time: 2:00:00
+A* exit status: 124
+
+B1 result classification: UNKNOWN / timeout
+B1 conflicts: 15,572,920
+B1 decisions: 248,944,938
+B1 propagations: 35,759,241,395
+B1 peak RSS: 703,468 KB
+B1 wall time: 2:00:00
+B1 exit status: 124
+
+B2 result classification: UNKNOWN / timeout
+B2 conflicts: 15,528,800
+B2 decisions: 245,659,982
+B2 propagations: 36,446,428,207
+B2 peak RSS: 688,336 KB
+B2 wall time: 2:00:00
+B2 exit status: 124
+```
+
+Interpretation:
+
+- No SAT witness and no UNSAT certificate.
+- Mathematical status is unchanged.
+- The terminal residual split remained memory-safe, below about 0.71GB peak
+  RSS per branch.
+- The extra residual branching did not decide E1 D3-only in two hours.
+- Do not automatically launch E2 terminal branches or G4-heavy variants.  The
+  next step should be a strategy decision using the terminal timeout data.

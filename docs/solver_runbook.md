@@ -270,6 +270,13 @@ BRANCH=b2 TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e1_d3_terminal_branch_
 Per terminal branch, the generated CNF has 1,894,053 variables and 7,426,200
 clauses.  Do not add G4 in this round.
 
+Observed result: all three E1 D3-only terminal branches timed out after two
+hours.  A* reached 15,836,581 conflicts with 690,088 KB peak RSS; B1 reached
+15,572,920 conflicts with 703,468 KB peak RSS; B2 reached 15,528,800 conflicts
+with 688,336 KB peak RSS.  This branch split was memory-safe but not decisive.
+Do not automatically launch E2 terminal branches without a new strategy
+decision.
+
 ## What to log
 
 For every solver attempt, save:

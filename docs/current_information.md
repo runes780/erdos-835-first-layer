@@ -473,6 +473,18 @@ logs:
   artifacts/solver_logs/e1_d3_terminal_b2_kissat_2h.log
 ```
 
+E1 D3-only terminal branch result:
+
+```text
+A*: UNKNOWN / timeout, 15,836,581 conflicts, 690,088 KB peak RSS
+B1: UNKNOWN / timeout, 15,572,920 conflicts, 703,468 KB peak RSS
+B2: UNKNOWN / timeout, 15,528,800 conflicts, 688,336 KB peak RSS
+```
+
+No SAT witness or UNSAT certificate was produced.  Mathematical status is
+unchanged.  Do not automatically launch E2 terminal branches or G4-heavy
+variants without a new strategy decision.
+
 ## Current repository status
 
 Implemented:
