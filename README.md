@@ -69,8 +69,137 @@ python3 -m src.erdos835_one_color rows --limit 10
 Export a pseudo-Boolean OPB instance:
 
 ```bash
-python3 -m src.erdos835_one_color opb --no-row-comments --output artifacts/problem835_one_color.opb
+python3 -m src.erdos835_one_color opb --no-row-comments --no-column-comments --output artifacts/problem835_one_color.opb
 ```
+
+Export the current strengthened OPB instance:
+
+```bash
+bash scripts/export_problem835_augmented_opb.sh
+```
+
+This version adds the safe triple-matching symmetry break through the fixed
+triple `{0,1,2}` and the redundant relative-design constraints
+`sum_{U superset T} x_{j,U}=8` for each `j` and each 4-set `T`.  It also
+adds the redundant \(D_a\) lower-subset count constraints for subset sizes
+0, 1, 2, and 3.
+
+Run the strengthened instance with RoundingSat's LP disabled:
+
+```bash
+TIME_LIMIT_SECONDS=21600 bash scripts/run_roundingsat_lp0_augmented_6h.sh
+```
+
+Run a small RoundingSat portfolio when more CPU use is desired:
+
+```bash
+SKIP_BASELINE=1 MAX_JOBS=5 TIME_LIMIT_SECONDS=21600 \
+  PREFIX=portfolio_extra_6h \
+  MANIFEST=artifacts/solver_logs/portfolio_extra_6h.jsonl \
+  bash scripts/run_roundingsat_portfolio.sh
+```
+
+This starts independent single-core solver variants with separate logs and a
+JSONL manifest, while leaving an already-running baseline process alone.
+
+After the strengthened one-colour portfolio times out, move to the smaller
+staged extension ladder.  The first target is `E_1`, which keeps \(D_a\) and
+one point-extension family but drops the other ten families:
+
+```bash
+bash scripts/export_problem835_e1_opb.sh
+TIME_LIMIT_SECONDS=7200 bash scripts/run_roundingsat_e1_2h.sh
+```
+
+The generated `E_1` OPB has 74,613 variables and 26,343 constraints with the
+basic triple-matching symmetry break.  The current default export also adds
+the safe off-triple block `D:0,1,3,5,7` and the redundant D lower-count
+constraints, giving 27,906 constraints.  If `E_1` is UNSAT, the first-layer
+object is already impossible.  If `E_1` is SAT or inconclusive, continue up the
+ladder: `E_2`, `E_4`, `E_8`, then `E_11`.
+
+The D-only target remains useful as an auxiliary check:
+
+```bash
+bash scripts/export_problem835_d_only_opb.sh
+TIME_LIMIT_SECONDS=7200 bash scripts/run_roundingsat_d_only_2h.sh
+```
+
+This asks only whether the fixed-colour \(D_a\) block system
+\(S(4,5,21)\) exists under the current symmetry break and redundant lower-count
+constraints.  If this produces a SAT witness, verify the selected blocks before
+building the fixed-D conditional one-colour instance.
+
+The current CNF/CDCL route for `E_1` is:
+
+```bash
+bash scripts/export_problem835_e1_cnf.sh
+TIME_LIMIT_SECONDS=7200 bash scripts/run_cadical_e1_2h.sh
+```
+
+This exports a pairwise DIMACS encoding with 74,613 variables and 3,607,768
+clauses.  This baseline CNF has the triple/off-triple symmetry units, but it
+does not include the OPB-only D lower-count constraints.  CaDiCaL can be used
+from `artifacts/solvers/cadical_pkg/usr/bin` if the local package has been
+downloaded and extracted.
+
+After a default CaDiCaL timeout, run a small parameter portfolio:
+
+```bash
+SKIP_BASELINE=1 MAX_JOBS=6 TIME_LIMIT_SECONDS=3600 \
+  PREFIX=e1_cadical_portfolio_1h \
+  MANIFEST=artifacts/solver_logs/e1_cadical_portfolio_1h.jsonl \
+  bash scripts/run_cadical_portfolio.sh
+```
+
+Generate the two residual-orbit branch CNFs recommended after the Kissat
+timeout:
+
+```bash
+bash scripts/export_problem835_e1_branch_cnfs.sh
+BRANCH=a TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e1_branch_2h.sh
+BRANCH=b TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e1_branch_2h.sh
+```
+
+Generate the G4-strengthened OPB branches:
+
+```bash
+bash scripts/export_problem835_e1_g4_branch_opbs.sh
+BRANCH=a TIME_LIMIT_SECONDS=3600 bash scripts/run_roundingsat_e1_g4_branch_1h.sh
+BRANCH=b TIME_LIMIT_SECONDS=3600 bash scripts/run_roundingsat_e1_g4_branch_1h.sh
+```
+
+After both E1 branch approaches time out, run the Pro-model E2 branch
+experiment:
+
+```bash
+bash scripts/export_problem835_e2_branch_cnfs.sh
+BRANCH=a TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e2_branch_2h.sh
+BRANCH=b TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e2_branch_2h.sh
+```
+
+After the E2 branches also time out, the next CNF strengthening uses
+sequential-counter encodings for the redundant D3 and G4 upper counts:
+
+```bash
+bash scripts/export_problem835_e1_d3_g4_branch_cnfs.sh
+BRANCH=a TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e1_d3_g4_branch_2h.sh
+BRANCH=b TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e1_d3_g4_branch_2h.sh
+```
+
+Each E1 D3/G4 branch has 8,357,853 variables and 21,071,999 clauses.
+If that combined strengthening times out, run the smaller ablations separately:
+
+```bash
+MODE=all bash scripts/export_problem835_e1_ablation_branch_cnfs.sh
+MODE=d3 BRANCH=a TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e1_ablation_branch_2h.sh
+MODE=d3 BRANCH=b TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e1_ablation_branch_2h.sh
+MODE=g4 BRANCH=a TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e1_ablation_branch_2h.sh
+MODE=g4 BRANCH=b TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e1_ablation_branch_2h.sh
+```
+
+D3-only has 1,894,053 variables and 7,426,199 clauses per branch.  G4-only
+has 6,538,413 variables and 17,253,569 clauses per branch.
 
 For the 32GB i5-13400 Windows PC, see `docs/pc_execution.md` and
 `docs/solver_runbook.md`.  The recommended path is WSL2 Ubuntu, one-colour OPB
@@ -82,9 +211,50 @@ If this repo is opened by Codex on the Windows PC, start from `TASKS.md`.
 
 - `src/erdos835_one_color.py`: parameter model, statistics, and sparse row
   generator.
+- `src/extension_ladder.py`: staged `E_m` generator for one, two, four, eight,
+  or eleven extension families.
 - `src/verify_one_color.py`: verifier for candidate one-color solutions.
 - `tests/test_one_color.py`: unit tests, including a small resolvable toy
   instance.
+- `scripts/export_problem835_opb.sh`: raw full one-colour OPB export.
+- `scripts/export_problem835_augmented_opb.sh`: strengthened OPB export with
+  symmetry breaking and G4 count constraints.
+- `scripts/export_problem835_d_only_opb.sh`: smaller D-only OPB export for the
+  \(S(4,5,21)\) block system.
+- `scripts/export_problem835_e1_opb.sh`: first staged extension-ladder OPB
+  export.
+- `scripts/export_problem835_e1_cnf.sh`: pairwise DIMACS CNF export for the
+  first staged extension-ladder target.
+- `scripts/export_problem835_e1_branch_cnfs.sh`: residual-orbit branch CNFs
+  with `D:0,1,3,6,8` and `D:0,1,3,6,9`.
+- `scripts/export_problem835_e1_g4_branch_opbs.sh`: E1 branch OPBs with D
+  lower counts and G4 equalities.
+- `scripts/export_problem835_e2_branch_cnfs.sh`: E2 residual-orbit branch CNFs
+  with the same two D branch units.
+- `scripts/export_problem835_e1_d3_g4_branch_cnfs.sh`: E1 residual-orbit branch
+  CNFs strengthened with D3 <= 9 and G4 <= 8 sequential-counter constraints.
+- `scripts/export_problem835_e1_ablation_branch_cnfs.sh`: E1 residual-orbit
+  branch CNFs for D3-only and G4-only ablation runs.
+- `scripts/run_roundingsat_lp0_augmented_6h.sh`: bounded RoundingSat run using
+  `--lp=0`.
+- `scripts/run_roundingsat_d_only_2h.sh`: bounded RoundingSat run for the
+  D-only OPB instance.
+- `scripts/run_roundingsat_e1_2h.sh`: bounded RoundingSat run for `E_1`.
+- `scripts/run_cadical_e1_2h.sh`: bounded CaDiCaL run for the `E_1` CNF.
+- `scripts/run_cadical_portfolio.sh`: launch a bounded portfolio of
+  independent CaDiCaL CNF variants.
+- `scripts/run_kissat_e1_branch_2h.sh`: bounded Kissat run for an E1 branch
+  CNF.
+- `scripts/run_kissat_e2_branch_2h.sh`: bounded Kissat run for an E2 branch
+  CNF.
+- `scripts/run_kissat_e1_d3_g4_branch_2h.sh`: bounded Kissat run for an E1
+  D3/G4-strengthened branch CNF.
+- `scripts/run_kissat_e1_ablation_branch_2h.sh`: bounded Kissat run for a
+  D3-only or G4-only E1 branch CNF.
+- `scripts/run_roundingsat_e1_g4_branch_1h.sh`: bounded RoundingSat run for a
+  G4-strengthened E1 branch OPB.
+- `scripts/run_roundingsat_portfolio.sh`: launch a bounded portfolio of
+  independent RoundingSat variants.
 - `TASKS.md`: handoff task brief for Codex on the Windows PC.
 - `notes/erdos835_first_layer_note.tex`: compact mathematical note.
 - `docs/current_information.md`: consolidated current mathematical and
@@ -100,3 +270,7 @@ If this repo is opened by Codex on the Windows PC, start from `TASKS.md`.
 
 This repo does not claim a solution of problem 835.  It records a concrete
 subproblem whose unsatisfiability would close the \(k=16\) first-layer case.
+The raw and strengthened one-colour RoundingSat runs reached time limits
+without SAT or UNSAT.  The active next target is now the staged extension
+ladder, starting with `E_1`.  D-only and fixed-D conditional instances are kept
+as auxiliary diagnostics rather than the main branch.

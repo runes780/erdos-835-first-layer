@@ -1,6 +1,6 @@
 # Current information summary
 
-Date: 2026-05-31
+Date: 2026-06-01
 
 This document records the working state of the Erdős problem 835 investigation
 captured in this repository.  It is a working record, not a claim of a solution.
@@ -26,10 +26,250 @@ The working assumptions from the previous reductions are:
   \(LS(4,5,21)\) map \(D\) and eleven point-extension maps \(g_j\) on 6-sets.
 - Fixing one colour \(a\in\mathbb F_{17}\) gives a pure exact-cover system.
 
-The one-colour exact-cover system is the current computational target.  If it
-is UNSAT, then the \(k=16\) first-layer object cannot exist.  If it is SAT, the
-one-colour shadow alone is not enough; the next task is to understand whether
-seventeen compatible colours can be assembled.
+The one-colour exact-cover system remains the certifiable target, but the
+active computation now attacks it through a staged extension ladder \(E_m\).
+If any necessary stage is UNSAT, then the \(k=16\) first-layer object cannot
+exist.  If a stage is SAT, it only says that weaker shadow is consistent.
+
+The current strengthened version keeps the same Boolean rows but appends two
+auditable families of constraints:
+
+- a safe triple-matching symmetry break through `{0,1,2}`;
+- redundant relative-design constraints
+  `sum_{U superset T} x_{j,U}=8` for every extension layer `j` and every 4-set
+  `T`.
+- redundant \(D_a\) lower-subset count constraints for subset sizes
+  0, 1, 2, and 3.
+
+The strengthened one-colour OPB has now been tested with a baseline run,
+a portfolio run, and one automatic follow-up portfolio.  All attempts reached
+`TIMELIMIT`; no SAT witness or UNSAT certificate was produced.  The best
+observed branch was `lubybase15`, reaching 15,372,000 conflicts in the
+follow-up run.
+
+The post-timeout route has been revised after the later planning discussion:
+
+1. `E_1`: \(D_a\) plus one point-extension family.
+2. `E_2`, `E_4`, `E_8`: add more extension families with cross-family
+   disjointness.
+3. `E_11`: recover the staged one-colour shadow.
+4. D-only and fixed-\(D_a\) conditional searches remain auxiliary diagnostics.
+
+The first `E_1` OPB was generated with the triple-matching symmetry break:
+
+```text
+variables: 74613
+constraints: 26343
+file size: 4.4M
+sha256: a24524b5d26534bfcf45095a9a924ee7af48d4724116eb6534a924d0756ef7b8
+```
+
+A 5-minute RoundingSat `--lp=0` smoke run on this `E_1` instance reached
+`s TIMELIMIT` after 875,035 conflicts.  Peak RSS was about 174MB with 0 swap.
+This produced no mathematical conclusion, but it confirms that `E_1` is
+lightweight enough for a wider portfolio.
+
+The active `E_1` export now uses the stronger safe normalization:
+
+- triple matching through `{0,1,2}`;
+- off-triple block `D:0,1,3,5,7`;
+- redundant D lower-count constraints for subset sizes 0, 1, 2, and 3.
+
+The regenerated stronger file has:
+
+```text
+variables: 74613
+constraints: 27906
+file size: 9.2M
+sha256: 94126fe65c3bd94d2a036eddbabb18e55d58f42cd6795abb2ba84662a40cc21e
+```
+
+A 10-minute six-way portfolio on this stronger `E_1` instance also reached
+`TIMELIMIT` on every branch.  The best branch was `lubybase15`, with 1,079,995
+conflicts and peak RSS about 129MB.
+
+A follow-up 2-hour ten-way portfolio also reached `TIMELIMIT` on every branch.
+The best branch was again `lubybase15`, with 5,250,782 conflicts and peak RSS
+about 231MB.  Memory remained healthy and swap stayed at 0B.  This points away
+from longer identical OPB/RoundingSat runs as the immediate next step; the next
+main experiment should be a CNF/CDCL encoding of `E_1`.
+
+The CNF/CDCL route is now operational.  The generated pairwise DIMACS instance
+has:
+
+```text
+variables: 74613
+clauses: 3607768
+file size: 57M
+sha256: 690112c309acc78a7dd58fee800f5f8097f479bab6177b6179980f6a51b4269f
+```
+
+This CNF is the baseline pairwise exact-one encoding plus symmetry unit
+clauses.  It does not include the OPB D lower-count equalities; that mismatch
+was caught in the later Pro-model audit and the documentation has been
+corrected.
+
+CaDiCaL was prepared locally without sudo by downloading and extracting the
+Ubuntu package into `artifacts/solvers/cadical_pkg`.  A 10-minute CaDiCaL smoke
+run reached `timeout` after 2,980,586 conflicts with peak RSS about 697MB.
+A 2-hour CaDiCaL baseline also reached timeout:
+
+```text
+conflicts: 34,615,957
+decisions: 101,541,116
+propagations: 22,753,179,630
+peak RSS: 930,980 KB
+swap: 0
+```
+
+No SAT witness or UNSAT certificate has been found.  A 9-branch, 1-hour
+CaDiCaL portfolio completed with timeout on every branch.  The best branch by
+conflicts was `preprocess1_optimize1` with 3,942,942 conflicts in one hour;
+memory stayed safe, with each branch below about 762MB RSS and swap at 0.
+
+Kissat 4.0.4 was then installed from the official Linux amd64 release binary.
+On the same `E_1` CNF, a 10-minute smoke run also timed out, but reached
+4,860,049 conflicts with about 222MB reported RSS.  A follow-up 2-hour Kissat
+run also timed out:
+
+```text
+conflicts: 57,070,395
+decisions: 880,874,492
+propagations: 48,143,111,456
+peak RSS: 229,012 KB
+swap: 0
+```
+
+Kissat is the best tested solver on this CNF so far, but it still did not
+decide `E_1`.  The current best next step is strategic review rather than
+another blind rerun: compare encodings, symmetry breaking, redundant
+constraints, and whether to move from `E_1` to another staged target.
+
+The next implemented experiment is the residual-orbit split proposed by the
+Pro-model audit.  The CNF generator now accepts extra branch units via
+`--force-d-block`, covering:
+
+```text
+Branch A: D:0,1,3,6,8
+Branch B: D:0,1,3,6,9
+```
+
+The ladder OPB generator now also supports `--add-g4-counts`, enabling E1
+branch OPBs with both D lower-count equalities and G4 equalities.
+
+The two residual-orbit Kissat branch CNFs both reached timeout:
+
+```text
+Branch A D:0,1,3,6,8: 48,117,911 conflicts, peak RSS 265,716 KB
+Branch B D:0,1,3,6,9: 47,834,751 conflicts, peak RSS 250,580 KB
+```
+
+No SAT witness or UNSAT certificate was produced, so the Pro-recommended
+Experiment 2 was run next: the G4-strengthened branch OPBs with RoundingSat
+`--lp=0`.
+
+The G4-strengthened branch OPBs also reached timeout:
+
+```text
+Branch A D:0,1,3,6,8: TIMELIMIT, 4,760,000 conflicts, peak RSS 397,556 KB
+Branch B D:0,1,3,6,9: TIMELIMIT, 4,658,000 conflicts, peak RSS 411,556 KB
+```
+
+No SAT witness or UNSAT certificate was produced.  Memory use stayed low, so
+this is a search-complexity result rather than a hardware/RAM failure.
+
+Experiment 3 has now been launched: `E_2` pairwise CNFs under the same two
+residual-orbit D branches.  Each branch has 128,877 variables and 6,449,846
+clauses:
+
+```text
+Branch A D:0,1,3,6,8 sha256: 13746f89cbaa424bd88654d45d66bb978821e263eaad6d10cb8a08d61596a10e
+Branch B D:0,1,3,6,9 sha256: 56080d1ad72bb002bd462bb062494233a7b90a990e1d0a1a864795b95277ad58
+```
+
+The active logs are `artifacts/solver_logs/e2_kissat_branch_a_2h.log` and
+`artifacts/solver_logs/e2_kissat_branch_b_2h.log`.
+
+Both active `E_2` branch logs reached timeout:
+
+```text
+Branch A D:0,1,3,6,8: UNKNOWN / timeout, 49,546,914 conflicts, peak RSS 462,444 KB
+Branch B D:0,1,3,6,9: UNKNOWN / timeout, 49,379,546 conflicts, peak RSS 436,164 KB
+```
+
+No SAT witness or UNSAT certificate was produced.  The next useful engineering
+target is to strengthen the branch-local CNF with selected redundant
+cardinality constraints, not to repeat the same unstrengthened `E_1` or `E_2`
+runs.  The Pro-model recommendation is to start with D3 <= 9 and G4 <= 8,
+using a bounded sequential-counter or totalizer encoding if the generated CNF
+size remains manageable.
+
+The sequential-counter CNF strengthening has been implemented for the staged
+ladder generator.  For each branch:
+
+```text
+E1 + D3/G4 CNF:  8,357,853 variables, 21,071,999 clauses
+E2 + D3/G4 CNF: 14,875,917 variables, 37,559,876 clauses
+```
+
+The active run is the smaller decisive E1 D3/G4 branch split:
+
+```text
+Branch A D:0,1,3,6,8 sha256: 2206e3b78ce1e885c2c5592f34d07d9017d223cbac610673ab8c3ae1de02f9b0
+Branch B D:0,1,3,6,9 sha256: f9f3807a7ab9078050b1ab61abbb8536f5c6760277b39fa3a8ed5c30348254fc
+```
+
+The active logs are
+`artifacts/solver_logs/e1_d3_g4_kissat_branch_a_2h.log` and
+`artifacts/solver_logs/e1_d3_g4_kissat_branch_b_2h.log`.
+
+The E1 D3/G4 branch split also reached timeout:
+
+```text
+Branch A D:0,1,3,6,8: UNKNOWN / timeout, 8,661,819 conflicts, peak RSS 2,523,444 KB
+Branch B D:0,1,3,6,9: UNKNOWN / timeout, 9,229,109 conflicts, peak RSS 2,579,572 KB
+```
+
+No SAT witness or UNSAT certificate was produced.  The run was memory-safe, but
+the stronger CNF increased propagation cost enough that a blind move to the
+larger E2 D3/G4 CNF is not the best immediate use of the machine.  The next
+step should be a strategy review or ablation run separating D3-only and G4-only
+constraints before escalating model size.
+
+The E1 ablation branch CNFs have been generated and launched:
+
+```text
+D3-only per branch: 1,894,053 variables, 7,426,199 clauses
+G4-only per branch: 6,538,413 variables, 17,253,569 clauses
+
+D3 Branch A sha256: ad3fb65a7d240f69367c2a4cc7705abf82d9f8c5bbf3834d041b32f6bd617e63
+D3 Branch B sha256: 085a3b2658484c927589fbc76b48e56d5c58599a0fdc6d1019d7f6d4600262ed
+G4 Branch A sha256: ec44bf4a2467bacded1f2310344ab957f1313ee7939951480b3061257a1713d6
+G4 Branch B sha256: 8711c84525dd8075a4e224469eb7ab2d4465ae9acf023290342322125e2e3cbf
+```
+
+The active ablation logs are:
+
+```text
+artifacts/solver_logs/e1_d3_kissat_branch_a_2h.log
+artifacts/solver_logs/e1_d3_kissat_branch_b_2h.log
+artifacts/solver_logs/e1_g4_kissat_branch_a_2h.log
+artifacts/solver_logs/e1_g4_kissat_branch_b_2h.log
+```
+
+The first D-only OPB has been generated with the triple-matching symmetry break
+and redundant D lower-count constraints:
+
+```text
+variables: 20349
+constraints: 7556
+file size: 5.8M
+```
+
+A 10-minute RoundingSat `--lp=0` smoke run on this D-only instance reached
+`s TIMELIMIT` after about 1.486M conflicts with peak RSS about 220MB.  This did
+not prove anything mathematically, but it confirms the smaller target is
+lightweight enough for stronger symmetry-breaking and encoding experiments.
 
 ## One-colour exact-cover formulation
 
@@ -152,17 +392,143 @@ memory soft limit: 24-28GB
 If there is no useful progress within that range, switch to smaller derived
 subsystems instead of letting the raw run consume days.
 
+Observed on the Windows PC with RoundingSat:
+
+```text
+raw 2-hour run: UNKNOWN / timeout
+peak RSS: about 1.6GB
+LP total time: 2747.5s
+short benchmark: --lp=0 gives far more conflicts/decisions per minute
+```
+
+Those observations led to the strengthened OPB and `--lp=0` portfolio runs.
+The subsequent `E_m` ladder experiments also timed out:
+
+```text
+E1 branch CNF A/B: timeout, about 48M conflicts per branch, RSS below 270MB
+E1 G4 OPB A/B: timeout, about 4.6M-4.8M conflicts per branch, RSS about 400MB
+E2 branch CNF A/B: timeout, about 49M conflicts per branch, RSS below 470MB
+E1 D3+G4 CNF A/B: timeout, about 8.7M-9.2M conflicts, RSS about 2.5GB
+E1 D3-only CNF A/B: timeout, about 14.6M-15.0M conflicts, RSS about 0.7GB
+E1 G4-only CNF A/B: timeout, about 6.7M-7.0M conflicts, RSS about 2.0GB
+```
+
+The current best reading is that D3-only is the cheapest strengthened CNF
+variant, while G4 and combined D3/G4 increase propagation cost and memory
+substantially.  Do not repeat unchanged E1/E2 runs.  The next decision is
+whether to run a moderate E2 D3-only probe or ask the Pro model for a strategy
+review using the accumulated experiment table.
+
+Current decision: run the moderate E2 D3-only branch probe as the next local
+experiment, while keeping `prompts/pro_after_ablation.md` ready for outside
+strategy review.  Do not escalate to E2 G4-only or E2 D3/G4 without new
+evidence.
+
+Generated E2 D3-only branch size:
+
+```text
+per branch: 1,948,317 variables, 10,268,276 clauses, about 188MB
+Branch A sha256: c8acbc385da0e08a1bd0cc67e5ff378c7c43057664ba313721178d5a59e99289
+Branch B sha256: 0c5ce67ead77f68decfeafd8fbabbe228ece7e2429f2ebdf0b6bd5787c54b597
+```
+
+E2 D3-only result:
+
+```text
+Branch A: UNKNOWN / timeout, 19,782,418 conflicts, 832,744 KB peak RSS
+Branch B: UNKNOWN / timeout, 19,235,813 conflicts, 857,116 KB peak RSS
+```
+
+No SAT witness or UNSAT certificate was produced.  Mathematical status is
+unchanged.  Do not start E2 G4-only or E2 D3/G4 automatically; the next useful
+step is a strategy review using the accumulated branch results.
+
+The Pro-model strategy review recommended refining the residual-orbit branch
+split before adding heavier G4 constraints.  The next branch family is:
+
+```text
+A*: D:{0,1,3,6,8}, D:{0,1,3,9,11}
+B1: D:{0,1,3,6,9}, D:{0,1,3,8,10}
+B2: D:{0,1,3,6,9}, D:{0,1,3,8,11}
+```
+
+An orbit-audit module now documents the branch coverage checks.  The generated
+E1 D3-only terminal CNFs have:
+
+```text
+per branch: 1,894,053 variables, 7,426,200 clauses, about 137MB
+A* sha256: efb652484721dc7bc384d30923127983cd829ae4b32ab63d0969194a37645109
+B1 sha256: 42e8e5e69292d4a93f7b3146d6f11adad6ca27c3e1d75eeb25f54130f68262ea
+B2 sha256: 5878781540b1ba625d78a9535f28497989daf997684f193c52b9a85c65ce11ce
+```
+
+Current active experiment:
+
+```text
+E1 D3-only terminal branches A*, B1, B2
+time limit: 2h per branch
+logs:
+  artifacts/solver_logs/e1_d3_terminal_a_star_kissat_2h.log
+  artifacts/solver_logs/e1_d3_terminal_b1_kissat_2h.log
+  artifacts/solver_logs/e1_d3_terminal_b2_kissat_2h.log
+```
+
+E1 D3-only terminal branch result:
+
+```text
+A*: UNKNOWN / timeout, 15,836,581 conflicts, 690,088 KB peak RSS
+B1: UNKNOWN / timeout, 15,572,920 conflicts, 703,468 KB peak RSS
+B2: UNKNOWN / timeout, 15,528,800 conflicts, 688,336 KB peak RSS
+```
+
+No SAT witness or UNSAT certificate was produced.  Mathematical status is
+unchanged.  Do not automatically launch E2 terminal branches or G4-heavy
+variants without a new strategy decision.
+
+Current decision:
+
+```text
+Run E2 D3-only on terminal branches A*, B1, B2 as the Pro-recommended fallback.
+Do not add G4 in this round.
+If these also time out, stop and request a fresh strategy review.
+```
+
+Generated E2 D3-only terminal CNFs:
+
+```text
+per branch: 1,948,317 variables, 10,268,277 clauses, about 188MB
+A* sha256: 58f3625f394e16f63e7f1d3c7848f83b2932151c7b9bd7ecbfc9551471b0c240
+B1 sha256: a78ba37444a1afe9212defe6e9f9638c6f0912c582b6d7b689395e9ebb4bd307
+B2 sha256: 734f3184f6155044063a94f7eeb1ef4a9e7ab492f0ceb2a811b2521973134e68
+```
+
+Current active experiment:
+
+```text
+E2 D3-only terminal branches A*, B1, B2
+time limit: 2h per branch
+logs:
+  artifacts/solver_logs/e2_d3_terminal_a_star_kissat_2h.log
+  artifacts/solver_logs/e2_d3_terminal_b1_kissat_2h.log
+  artifacts/solver_logs/e2_d3_terminal_b2_kissat_2h.log
+```
+
 ## Current repository status
 
 Implemented:
 
 - parameter model and exact-cover statistics;
+- staged \(E_m\) extension-ladder stats and OPB export;
+- D-only OPB export and D-only verifier;
+- fixed-\(D_a\) conditional one-colour stats and OPB export;
 - sparse exact-cover row generator;
 - OPB export;
 - candidate verifier for one-colour solutions;
 - toy instance tests;
 - LaTeX working note;
 - Pro-model next-round prompt;
+- post-ablation Pro-model strategy prompt;
+- terminal residual-branch orbit audit;
 - WSL/PC execution notes.
 
 Verified locally:
@@ -170,12 +536,14 @@ Verified locally:
 - unit tests pass;
 - smoke script passes;
 - full OPB export succeeds;
-- LaTeX note compiles.
+- LaTeX note compilation was not re-verified on this Windows/WSL setup because
+  `pdflatex` is not installed.
 
 Not done:
 
-- no solver result yet;
+- no SAT witness or UNSAT certificate from the strengthened one-colour runs;
 - no SAT witness;
 - no UNSAT certificate;
 - no public claim of solution.
-
+- no combined 17-colour first-layer CNF yet; this is documented as a later,
+  much larger target.

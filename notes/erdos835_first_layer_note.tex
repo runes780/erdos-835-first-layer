@@ -3,50 +3,128 @@
 \usepackage{amsmath,amssymb,amsthm}
 
 \newcommand{\binomV}[2]{\binom{#1}{#2}}
+\newcommand{\F}{\mathbb F_{17}}
 
-\title{A one-colour exact-cover test for the first remaining case of Problem 835}
+\title{First-layer and one-colour exact-cover tests for Problem 835}
 \author{}
 \date{}
 
 \begin{document}
 \maketitle
 
-\section*{The first layer}
+\section*{Status}
 
-In the usual reduction of Problem 835, a colouring for the case \(k\) gives a
-large set \(S(k-1,k,2k)\).  The known necessary conditions leave the first
-serious case \(k=16\).  The first-layer derivation used here may be stated as
-follows.
+This note records a necessary condition for the first remaining case \(k=16\).
+It is not a proof excluding \(k=16\).  The current computational target is the
+one-colour shadow of the first-layer object.  An UNSAT certificate for that
+shadow would rule out the first-layer object, and hence rule out the original
+\(J(32,16)\) colouring.
 
-Let \(V\) be a set of 21 points.  Suppose that
+\section*{Complement invariance}
+
+Let \(C\) be an \(S(k-1,k,2k)\) on a \(2k\)-point set \(\Omega\).  If \(k\) is
+even, then
 \[
-  D:\binomV{V}{5}\longrightarrow \mathbb F_{17}
+  X\in C\quad\Longleftrightarrow\quad \Omega\setminus X\in C
 \]
-is an \(LS(4,5,21)\), and suppose that there are eleven functions
+for every \(k\)-set \(X\).
+
+For \(0\le s\le k-1\), the number of blocks through a fixed \(s\)-set is
 \[
-  g_j:\binomV{V}{6}\longrightarrow \mathbb F_{17},
-  \qquad j=1,\ldots,11,
-\]
-such that each \(g_j\) point-extends \(D\), and for every 6-set \(U\subset V\)
-one has
-\[
-  \{g_1(U),\ldots,g_{11}(U)\}
+  \lambda_s
   =
-  \mathbb F_{17}\setminus
-  \{D(U\setminus\{u\}):u\in U\}.
+  \frac{\binom{2k-s}{k-1-s}}{k-s}
+  =
+  \frac{\binom{2k-s}{k-s}}{k+1}.
 \]
-An obstruction to this first layer would rule out the \(k=16\) case.
+For a fixed \(k\)-set \(X\), write \(\varepsilon=1_{X\in C}\).  Inclusion-
+exclusion gives the number \(n_0(X)\) of blocks disjoint from \(X\):
+\[
+  n_0(X)
+  =
+  \sum_{s=0}^{k-1}(-1)^s\binom{k}{s}\lambda_s
+  +(-1)^k\varepsilon.
+\]
+The finite-difference identity
+\[
+  \sum_{s=0}^{k}(-1)^s\binom{k}{s}\binom{2k-s}{k-s}=1
+\]
+therefore gives
+\[
+  n_0(X)=\frac{1-(-1)^k}{k+1}+(-1)^k\varepsilon.
+\]
+When \(k\) is even this is \(n_0(X)=\varepsilon\).  The only \(k\)-set disjoint
+from \(X\) is \(\Omega\setminus X\), proving complement invariance.
+
+\section*{The first layer for \(k=16\)}
+
+Let
+\[
+  \Omega=R\sqcup V,\qquad |R|=11,\qquad |V|=21.
+\]
+For a hypothetical \(17\)-colouring
+\[
+  c:\binom{\Omega}{16}\to\F,
+\]
+define, for \(0\le h\le 11\),
+\[
+  F_h(H,S)=c((R\setminus H)\cup S),
+  \qquad
+  H\subseteq R,\ |H|=h,\quad S\subseteq V,\ |S|=5+h.
+\]
+For \(H\subseteq R\), \(|H|=h\), and \(S\subseteq V\), \(|S|=4+h\), the
+\(15\)-set \((R\setminus H)\cup S\) has 17 supersets.  Hence the layer equation
+is
+\[
+  \{F_{h-1}(H\setminus\{r\},S):r\in H\}
+  \cup
+  \{F_h(H,S\cup\{v\}):v\in V\setminus S\}
+  =
+  \F
+\]
+as a multiset.  The case \(h=0\) says \(F_0\) is an \(LS(4,5,21)\) colouring.
+
+Set
+\[
+  D(S)=F_0(\varnothing,S),\qquad S\in\binomV{V}{5},
+\]
+and for \(r\in R\),
+\[
+  g_r(U)=F_1(\{r\},U),\qquad U\in\binomV{V}{6}.
+\]
+The \(h=1\) layer equation gives, for every \(5\)-set \(S\subset V\),
+\[
+  \{D(S)\}\cup\{g_r(S\cup\{v\}):v\in V\setminus S\}=\F.
+\]
+Thus each \(g_r\) point-extends \(D\).
+
+For a \(6\)-set \(U\subset V\), the six facet colours
+\[
+  D(U\setminus\{u\}),\qquad u\in U,
+\]
+are distinct: if two equal-colour facets existed, that colour class of \(D\)
+would contain two \(5\)-blocks through the same \(4\)-set.  Applying the top
+star equation to \(V\setminus U\) and using complement invariance gives
+\[
+  \{g_r(U):r\in R\}
+  =
+  \F\setminus\{D(U\setminus\{u\}):u\in U\}.
+\]
+
+Therefore any \(k=16\) solution forces an \(LS(4,5,21)\) colouring \(D\) and
+eleven point-extensions \(g_1,\ldots,g_{11}\) satisfying pointwise
+complementarity on every \(6\)-set.
 
 \section*{One fixed colour}
 
-Fix \(a\in\mathbb F_{17}\).  Put
+Fix \(a\in\F\).  Put
 \[
   D_a=\{S\in\binomV{V}{5}:D(S)=a\},
   \qquad
   G_{j,a}=\{U\in\binomV{V}{6}:g_j(U)=a\}.
 \]
-Then \(D_a\) is an \(S(4,5,21)\), and the sets \(D_a,G_{1,a},\ldots,G_{11,a}\)
-must satisfy the following exact-cover equations:
+Then \(D_a\) is an \(S(4,5,21)\).  The one-colour shadow is exactly the
+following system:
 \[
   \sum_{\substack{S\supset T\\ |S|=5}} d_S=1
   \quad\text{for all }T\in\binomV{V}{4},
@@ -61,41 +139,156 @@ and
   +\sum_{\substack{S\subset U\\ |S|=5}}d_S=1
   \quad\text{for all }U\in\binomV{V}{6}.
 \]
-Here \(d_S\) is the indicator of \(S\in D_a\), and \(x_{j,U}\) is the indicator
-of \(U\in G_{j,a}\).
+Here \(d_S=1_{S\in D_a}\), and \(x_{j,U}=1_{U\in G_{j,a}}\).
 
-\section*{Size of the test}
+\section*{Forced parameters}
 
-There are
+Since \(D_a\) is an \(S(4,5,21)\),
 \[
-  \binom{21}{5}=20349
+  |D_a|=\frac{\binom{21}{4}}{\binom{5}{4}}=1197,
 \]
-\(d\)-variables and
+and the number of \(D_a\)-blocks through a fixed \(t\)-set, \(0\le t\le4\), is
 \[
-  11\binom{21}{6}=596904
+\begin{array}{c|ccccc}
+t&0&1&2&3&4\\
+\hline
+\lambda_t^D&1197&285&57&9&1
+\end{array}
 \]
-\(x\)-variables.  Thus the exact-cover matrix has \(617253\) rows.  The
-columns are the \(4\)-set equations, the \((j,S)\)-equations, and the
-\(6\)-set equations, namely
+For each \(j\), the set \(G_{j,a}\) is a relative \(4-(21,6,8)\) design:
 \[
-  \binom{21}{4}+11\binom{21}{5}+\binom{21}{6}
-  =5985+223839+54264
-  =284088.
+\begin{array}{c|ccccc}
+t&0&1&2&3&4\\
+\hline
+\lambda_t^G&3192&912&228&48&8
+\end{array}
 \]
-Each column has length \(17\).  Counting row incidences gives
+The \(t=5\) value is conditional: a \(5\)-set \(S\) is contained in no
+\(G_{j,a}\)-block when \(S\in D_a\), and in exactly one \(G_{j,a}\)-block when
+\(S\notin D_a\).
+
+A \(6\)-set contains at most one \(D_a\)-block.  Therefore the number of
+forbidden \(6\)-sets is \(1197\cdot16=19152\), the number of allowed \(6\)-sets
+is
 \[
-  \binom{21}{5}(5+11+16)+11\binom{21}{6}(6+1)
-  =4829496.
+  \binom{21}{6}-19152=35112,
+\]
+and the eleven \(G_{j,a}\)'s partition these allowed \(6\)-sets.
+
+\section*{Intersection checks}
+
+For \(U\in G_{j,a}\), let
+\[
+  n_r(U)=|\{S\in D_a:|S\cap U|=r\}|.
+\]
+Then
+\[
+\begin{array}{c|rrrrrr}
+r&0&1&2&3&4&5\\
+\hline
+n_r&177&480&405&120&15&0
+\end{array}
+\]
+For \(S\in D_a\), let
+\[
+  m_r(S)=|\{U\in G_{j,a}:|S\cap U|=r\}|.
+\]
+Then
+\[
+\begin{array}{c|rrrrrr}
+r&0&1&2&3&4&5\\
+\hline
+m_r&472&1280&1080&320&40&0
+\end{array}
+\]
+Inside one \(G_{j,a}\), a fixed \(U\) has
+\[
+\begin{array}{c|rrrrrrr}
+r&0&1&2&3&4&5&6\\
+\hline
+M_r&295&1056&1215&520&105&0&1
+\end{array}
+\]
+neighbours at intersection size \(r\).  Between two different \(G\)'s, a fixed
+\(U\) has
+\[
+\begin{array}{c|rrrrrrr}
+r&0&1&2&3&4&5&6\\
+\hline
+N_r&294&1062&1200&540&90&6&0
+\end{array}
+\]
+These numbers are integral and nonnegative; they are useful implementation
+checks, but they do not give a contradiction.
+
+\section*{Local models}
+
+Around a fixed \(4\)-set \(T\), write \(X=V\setminus T\), \(|X|=17\).  The
+colours \(D(T\cup\{x\})\), \(x\in X\), are all colours of \(\F\).  For each
+\(t\in T\), the map
+\[
+  \phi_t(xy)=D((T\setminus\{t\})\cup\{x,y\})
+\]
+is a near-one-factorization of \(K_{17}\).  The eleven functions
+\[
+  \psi_j(xy)=g_j(T\cup\{x,y\})
+\]
+must complete the four \(\phi_t\)'s so that, on each edge, the total set of
+fifteen edge-colours is all colours except the two endpoint colours.  This is a
+small diagnostic SAT core, but an UNSAT result for one local \(D\)-pattern
+would only rule out that local pattern.
+
+Around a fixed \(D_a\)-block \(S\), the local \(11\times16\) problem is always
+feasible.  The allowed colours form an 11-regular bipartite graph on two parts
+of size 16, and any regular bipartite graph decomposes into perfect matchings.
+Therefore an obstruction cannot live inside a single \(D_a\)-block.
+
+\section*{Exact-cover sizes}
+
+The one-colour exact-cover instance has
+\[
+  \binom{21}{5}+11\binom{21}{6}=617253
+\]
+Boolean row variables and
+\[
+  \binom{21}{4}+11\binom{21}{5}+\binom{21}{6}=284088
+\]
+exact-cover columns, with \(4829496\) incidences.
+
+The current strengthened OPB keeps these variables and appends:
+\[
+  d_{\{0,1,2,3,4\}}=
+  d_{\{0,1,2,5,6\}}=\cdots=
+  d_{\{0,1,2,19,20\}}=1,
+\]
+which is a safe symmetry break because the \(D_a\)-blocks through any fixed
+triple form a perfect matching on the remaining 18 points; and
+\[
+  \sum_{\substack{U\supset T\\ |U|=6}} x_{j,U}=8
+  \quad
+  (j=1,\ldots,11,\ T\in\binomV{V}{4}),
+\]
+which is the redundant \(G_{j,a}\) relative \(4\)-design count.
+It also appends the redundant \(D_a\) lower-count constraints
+\[
+  \sum_{\substack{S\supset X\\ |S|=5}} d_S
+  =
+  \frac{\binom{21-|X|}{4-|X|}}{\binom{5-|X|}{4-|X|}},
+  \qquad |X|=0,1,2,3.
 \]
 
-\section*{Computational target}
+The full combined \(D+g_1+\cdots+g_{11}\) first-layer exact cover is much
+larger: \(10493301\) Boolean row variables, \(5446749\) exact-cover columns,
+and \(92594733\) incidences.  This is the natural later target if the
+one-colour shadow is satisfiable or too weak, but it is not the current first
+run.
 
-The useful target is not to enumerate all \(LS(4,5,21)\)'s.  It is first to
-decide whether the one-colour exact-cover instance above is satisfiable.  An
-UNSAT certificate for this instance would already contradict the assumed
-first-layer object.  If it is satisfiable, the next useful target is to extract
-structural information from its solutions, especially automorphisms, forced
-block counts on small subsets, and any obstruction to assembling all seventeen
-colours simultaneously.
+\section*{Conclusion}
+
+No hand contradiction is known from the fixed-colour parameters, local block
+neighbourhoods, fixed \(4\)-set neighbourhoods, or intersection numbers.  The
+best current certifiable target is the strengthened one-colour global
+exact-cover instance.  UNSAT for this instance excludes the \(k=16\)
+first-layer object; SAT would only produce a candidate one-colour shadow.
 
 \end{document}
