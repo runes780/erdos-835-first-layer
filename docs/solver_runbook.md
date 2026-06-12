@@ -277,6 +277,20 @@ with 688,336 KB peak RSS.  This branch split was memory-safe but not decisive.
 Do not automatically launch E2 terminal branches without a new strategy
 decision.
 
+The selected next decision is to run E2 D3-only on the same terminal branches,
+without G4:
+
+```bash
+bash scripts/export_problem835_e2_d3_terminal_branch_cnfs.sh
+BRANCH=a_star TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e2_d3_terminal_branch_2h.sh
+BRANCH=b1 TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e2_d3_terminal_branch_2h.sh
+BRANCH=b2 TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e2_d3_terminal_branch_2h.sh
+```
+
+Per terminal branch, the generated CNF has 1,948,317 variables and 10,268,277
+clauses.  If these also time out, stop and request a fresh strategy review
+instead of escalating to G4-heavy variants.
+
 ## What to log
 
 For every solver attempt, save:

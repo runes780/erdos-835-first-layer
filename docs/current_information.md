@@ -485,6 +485,34 @@ No SAT witness or UNSAT certificate was produced.  Mathematical status is
 unchanged.  Do not automatically launch E2 terminal branches or G4-heavy
 variants without a new strategy decision.
 
+Current decision:
+
+```text
+Run E2 D3-only on terminal branches A*, B1, B2 as the Pro-recommended fallback.
+Do not add G4 in this round.
+If these also time out, stop and request a fresh strategy review.
+```
+
+Generated E2 D3-only terminal CNFs:
+
+```text
+per branch: 1,948,317 variables, 10,268,277 clauses, about 188MB
+A* sha256: 58f3625f394e16f63e7f1d3c7848f83b2932151c7b9bd7ecbfc9551471b0c240
+B1 sha256: a78ba37444a1afe9212defe6e9f9638c6f0912c582b6d7b689395e9ebb4bd307
+B2 sha256: 734f3184f6155044063a94f7eeb1ef4a9e7ab492f0ceb2a811b2521973134e68
+```
+
+Current active experiment:
+
+```text
+E2 D3-only terminal branches A*, B1, B2
+time limit: 2h per branch
+logs:
+  artifacts/solver_logs/e2_d3_terminal_a_star_kissat_2h.log
+  artifacts/solver_logs/e2_d3_terminal_b1_kissat_2h.log
+  artifacts/solver_logs/e2_d3_terminal_b2_kissat_2h.log
+```
+
 ## Current repository status
 
 Implemented:

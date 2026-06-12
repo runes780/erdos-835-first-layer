@@ -94,6 +94,21 @@ class ExtensionLadderCnfStatsTests(unittest.TestCase):
         self.assertEqual(stats.auxiliary_variables, 14747040)
         self.assertEqual(stats.total_clauses, 37559876)
 
+    def test_problem_e2_terminal_branch_d3_cnf_counts(self):
+        stats = compute_extension_ladder_cnf_stats(
+            OneColorConfig(v=21, t=4, extension_count=2),
+            symmetry_break="triple-matching-off-triple",
+            forced_d_blocks=[(0, 1, 3, 6, 8), (0, 1, 3, 9, 11)],
+            add_d3_upper_counts=True,
+        )
+
+        self.assertEqual(stats.variables, 1948317)
+        self.assertEqual(stats.auxiliary_variables, 1819440)
+        self.assertEqual(stats.d3_upper_constraints, 1330)
+        self.assertEqual(stats.d3_upper_clauses, 3818430)
+        self.assertEqual(stats.symmetry_unit_clauses, 12)
+        self.assertEqual(stats.total_clauses, 10268277)
+
 
 class ExtensionLadderCnfExportTests(unittest.TestCase):
     def test_e1_toy_cnf_exports_dimacs_clauses(self):

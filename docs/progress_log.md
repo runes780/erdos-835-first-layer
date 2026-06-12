@@ -1431,3 +1431,76 @@ Interpretation:
 - The extra residual branching did not decide E1 D3-only in two hours.
 - Do not automatically launch E2 terminal branches or G4-heavy variants.  The
   next step should be a strategy decision using the terminal timeout data.
+
+Decision after the E1 D3-only terminal timeouts:
+
+- Continue with the Pro-recommended fallback: E2 D3-only on the same terminal
+  branches A*, B1, B2.
+- Do not add G4 in this round.
+- If the E2 terminal branches also time out, stop and request a fresh strategy
+  review rather than continuing to larger encodings.
+
+Added scripts:
+
+```text
+scripts/export_problem835_e2_d3_terminal_branch_cnfs.sh
+scripts/run_kissat_e2_d3_terminal_branch_2h.sh
+```
+
+Generated E2 D3-only terminal branch CNFs:
+
+```text
+command: bash scripts/export_problem835_e2_d3_terminal_branch_cnfs.sh
+
+per branch:
+  variables: 1,948,317
+  base variables: 128,877
+  auxiliary variables: 1,819,440
+  clauses: 10,268,277
+  exact-one clauses: 6,395,571
+  disjointness clauses: 54,264
+  D3 constraints: 1,330
+  D3 clauses: 3,818,430
+  symmetry unit clauses: 12
+  file size: 187,606,444 bytes
+
+A* CNF: artifacts/problem835_e2_d3_terminal_a_star.cnf
+A* sha256: 58f3625f394e16f63e7f1d3c7848f83b2932151c7b9bd7ecbfc9551471b0c240
+
+B1 CNF: artifacts/problem835_e2_d3_terminal_b1.cnf
+B1 sha256: a78ba37444a1afe9212defe6e9f9638c6f0912c582b6d7b689395e9ebb4bd307
+
+B2 CNF: artifacts/problem835_e2_d3_terminal_b2.cnf
+B2 sha256: 734f3184f6155044063a94f7eeb1ef4a9e7ab492f0ceb2a811b2521973134e68
+```
+
+Verification before launch:
+
+```text
+python -m unittest discover -s tests -v
+result: 65 tests OK
+
+bash -n scripts/export_problem835_e2_d3_terminal_branch_cnfs.sh
+bash -n scripts/run_kissat_e2_d3_terminal_branch_2h.sh
+result: OK
+```
+
+Launched the three E2 D3-only terminal branch Kissat runs:
+
+```text
+A* command: BRANCH=a_star TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e2_d3_terminal_branch_2h.sh
+A* log: artifacts/solver_logs/e2_d3_terminal_a_star_kissat_2h.log
+
+B1 command: BRANCH=b1 TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e2_d3_terminal_branch_2h.sh
+B1 log: artifacts/solver_logs/e2_d3_terminal_b1_kissat_2h.log
+
+B2 command: BRANCH=b2 TIME_LIMIT_SECONDS=7200 bash scripts/run_kissat_e2_d3_terminal_branch_2h.sh
+B2 log: artifacts/solver_logs/e2_d3_terminal_b2_kissat_2h.log
+
+initial status: all three kissat processes running
+initial memory: about 3.0GiB used in WSL, 0B swap
+initial RSS:
+  A*: about 708MB
+  B1: about 725MB
+  B2: about 714MB
+```
